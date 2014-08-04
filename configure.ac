@@ -1,0 +1,15 @@
+PACKAGE=clutterMenu
+VERSION="0.1.0"
+
+AC_INIT(PACKAGE, VERSION)
+AC_CONFIG_SRCDIR(src/main.c)
+AM_INIT_AUTOMAKE
+
+AC_PROG_CC
+AM_PROG_CC_C_O
+
+PKG_CHECK_MODULES(CLUTTER, [ clutter-1.0 >= 1.0.0])
+PKG_CHECK_MODULES(GIO, [gio-2.0 >= 2.26.0])
+
+AC_OUTPUT(Makefile src/Makefile)
+
