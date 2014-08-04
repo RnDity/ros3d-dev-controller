@@ -18,7 +18,7 @@ aclocal \
     && automake --add-missing \
     && autoconf
 
-./configure prefix=`pwd`
+./configure prefix=`pwd` $CONFIGURE_FLAGS 
 make
 make install
 
