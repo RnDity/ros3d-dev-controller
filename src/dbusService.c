@@ -4,7 +4,10 @@ static GDBusNodeInfo *introspection_data = NULL;
 static const gchar introspection_xml[] =
     "<node>"
     "  <interface name='ros3d.ServoDaemon'>"
+    "    <annotation name='ros3d.ServoDaemon.Annotation' value='OnInterface'/>"
+    "    <annotation name='ros3d.ServoDaemon.Annotation' value='AlsoOnInterface'/>"
     "    <method name='SendMessage'>"
+    "      <annotation name='ros3d.ServoDaemon.Annotation' value='OnMethod'/>"
     "      <arg type='s' name='message' direction='in'/>"
     "      <arg type='s' name='response' direction='out'/>"
     "    </method>"
@@ -29,6 +32,7 @@ static void handle_method_call(GDBusConnection *conn,
 {
         if (!g_strcmp0(method_name, "SendMessage")) 
         {
+            printf("method call SendMessage\n");
             gchar *message;
             gchar *response;
             g_variant_get(parameters, "(s)", &message);
@@ -37,6 +41,8 @@ static void handle_method_call(GDBusConnection *conn,
             g_free(message);
             g_free(response);
         }
+        else
+            printf("method call else\n");
 }
 
 static GVariant *handle_get_property(GDBusConnection *conn,
@@ -47,6 +53,7 @@ static GVariant *handle_get_property(GDBusConnection *conn,
         GError **error,
         gpointer user_data)
 {
+    printf("get property\n");
     return NULL;
 }
 
@@ -59,6 +66,7 @@ static gboolean handle_set_property(GDBusConnection *conn,
         GError **error,
         gpointer user_data)
 {
+    printf("set property\n");
     return FALSE;
 }
 
@@ -69,6 +77,7 @@ static void cleanup()
 
 static void sig_handler(int signo)
 {
+    printf("sig handler\n");
     if (signo == SIGINT) {
         g_main_loop_quit(loop);
     }
@@ -98,16 +107,18 @@ int main(int argc, char* argv[])
         close(pipefd[1]);
         g_free(conn_name);
     }
+
     GDBusNodeInfo *introspection_data = g_dbus_node_info_new_for_xml(introspection_xml, NULL);
     g_assert (introspection_data != NULL);
-    GDBusInterfaceInfo *interface_info = g_dbus_node_info_lookup_interface(introspection_data, "ros3d.ServoDaemon");
+    //GDBusInterfaceInfo *interface_info = g_dbus_node_info_lookup_interface(introspection_data, "ros3d.ServoDaemon");
     owner_id =  g_dbus_connection_register_object(connection,
             "/ros3d/ServoDaemon",
-                interface_info,
+                introspection_data->interfaces[0],
                 &interface_vtable,
                 NULL,
                 NULL,
                 NULL);
+    g_assert(owner_id > 0);
     syslog(LOG_NOTICE, "Entering main loop");
     printf("Entering main loop\n");
     g_main_loop_run(main_loop);

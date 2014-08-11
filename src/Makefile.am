@@ -1,6 +1,11 @@
-bin_PROGRAMS = dbusService
+bin_PROGRAMS = dratkeService dbusServer
 
-dbusService_LDADD = $(GIO_LIBS)
-dbusService_CFLAGS = $(GIO_CFLAGS)
-dbusService_SOURCES = dbusService.c dbusService.h
+dratkeService_LDADD = $(GIO_LIBS)
+dratkeService_CFLAGS = $(GIO_CFLAGS)
+dratkeService_SOURCES = dratkeService.c
+
+
+dbusServer_LDADD = $(GIO_LIBS)
+dbusServer_CFLAGS = $(GIO_CFLAGS)
+dbusServer_SOURCES = dbusServer.c
 
