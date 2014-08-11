@@ -94,7 +94,8 @@ int main(int argc, char* argv[])
     //g_timeout_add_seconds(10, callbackHello, "Hello_function");
 
     GError *error = NULL;
-    connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error);
+    //connection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL, &error);
+    connection = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &error);
     if (error != NULL) {
         syslog(LOG_ERR, "Failed to acquire connection, quitting...\n");
         printf("Failed to acquire connection, quitting...\n");

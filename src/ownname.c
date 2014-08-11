@@ -1,5 +1,11 @@
 #include <gio/gio.h>
 
+static const GDBusInterfaceVTable interface_vtable = {
+    &handle_method_call,
+    NULL,
+    NULL
+};
+
     static void
 on_bus_acquired (GDBusConnection *connection,
         const gchar     *name,
