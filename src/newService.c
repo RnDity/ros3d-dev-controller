@@ -10,10 +10,9 @@
 static GDBusNodeInfo *introspection_data = NULL;
 static const gchar introspection_xml[] =
    "<node>"
-   "  <interface name='ros3d.kontroler.TestInterface'>"
+   "  <interface name='ros3d.kontroler.Interface'>"
    "    <annotation name='ros3d.kontroler.Annotation' value='OnInterface'/>"
-   "    <annotation name='ros3d.kontroler.Annotation' value='AlsoOnInterface'/>"
-   "    <method name='SendMessage'>"
+   "    <method name='GetServos'>"
    "      <annotation name='ros3d.kontroler.Annotation' value='OnMethod'/>"
    "      <arg type='s' name='message' direction='in'/>"
    "      <arg type='s' name='response' direction='out'/>"
@@ -30,7 +29,16 @@ static void handle_method_call (GDBusConnection       *connection,
         GDBusMethodInvocation *invocation,
         gpointer               user_data)
 {
-    //printf("method_call\n");
+    if(g_strcmp0(method_name, "GetServos") == 0)
+    {
+        gchar *response;
+        const gchar *greeting;
+        g_variant_get (parameters, "(&s)", &greeting);
+        g_print("%s: %s\n", method_name, greeting);
+        response = g_strdup_printf("GetServo %s", greeting);
+        g_dbus_method_invocation_return_value(invocation,
+                g_variant_new("(s)", response));
+    }
 }
 
 static gboolean handle_set_property (GDBusConnection  *connection,
@@ -42,7 +50,7 @@ static gboolean handle_set_property (GDBusConnection  *connection,
         GError          **error,
         gpointer          user_data)
 {
-    //printf("set property");
+    g_print("set property\n");
     g_set_error (error,
             G_IO_ERROR,
             G_IO_ERROR_FAILED,
@@ -61,7 +69,7 @@ static GVariant *handle_get_property (GDBusConnection  *connection,
         GError          **error,
         gpointer          user_data)
 {
-    //printf("get property");
+    g_print("get property\n");
     GVariant *ret;
     return ret;
 }
@@ -80,7 +88,7 @@ static void on_bus_acquired (GDBusConnection *connection,
     guint registration_id;
 
     registration_id = g_dbus_connection_register_object (connection,
-            "/ros3d/kontroler/TestObject",
+            "/ros3d/kontroler/Object",
             introspection_data->interfaces[0],
             &interface_vtable,
             NULL,  /* user_data */
@@ -113,7 +121,7 @@ gint main (gint argc, gchar *argv[])
     g_assert(introspection_data != NULL);
 
     id = g_bus_own_name(G_BUS_TYPE_SESSION,
-            "ros3d.kontroler.TestServer",
+            "ros3d.kontroler.Server",
             G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT |
             G_BUS_NAME_OWNER_FLAGS_REPLACE,
             on_bus_acquired,
