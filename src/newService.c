@@ -12,8 +12,14 @@ static const gchar introspection_xml[] =
    "<node>"
    "  <interface name='ros3d.kontroler.Interface'>"
    "    <annotation name='ros3d.kontroler.Annotation' value='OnInterface'/>"
-   "    <method name='GetServos'>"
-   "      <annotation name='ros3d.kontroler.Annotation' value='OnMethod'/>"
+   "    <method name='GetStatus'>"
+   "      <arg type='s' name='response' direction='out'/>"
+   "    </method>"
+   "    <method name='GetRange'>"
+   "      <arg type='s' name='message' direction='in'/>"
+   "      <arg type='s' name='response' direction='out'/>"
+   "    </method>"
+   "    <method name='GetPosition'>"
    "      <arg type='s' name='message' direction='in'/>"
    "      <arg type='s' name='response' direction='out'/>"
    "    </method>"
@@ -29,16 +35,38 @@ static void handle_method_call (GDBusConnection       *connection,
         GDBusMethodInvocation *invocation,
         gpointer               user_data)
 {
-    if(g_strcmp0(method_name, "GetServos") == 0)
+    if(g_strcmp0(method_name, "GetStatus") == 0)
     {
         gchar *response;
-        const gchar *greeting;
-        g_variant_get (parameters, "(&s)", &greeting);
-        g_print("%s: %s\n", method_name, greeting);
-        response = g_strdup_printf("GetServo %s", greeting);
+        const gchar *message;
+        //g_variant_get (parameters, "(&s)", &message);
+        g_print("%s\n", method_name);
+        message = "test";
+        response = g_strdup_printf("[%s:%s]", message, message);
         g_dbus_method_invocation_return_value(invocation,
                 g_variant_new("(s)", response));
     }
+    else if(g_strcmp0(method_name, "GetRange") == 0)
+    {
+        gchar *response;
+        const gchar *message;
+        g_variant_get (parameters, "(&s)", &message);
+        g_print("%s: %s\n", method_name, message);
+        response = g_strdup_printf("GetRange %s", message);
+        g_dbus_method_invocation_return_value(invocation,
+                g_variant_new("(s)", response));
+    }
+    else if(g_strcmp0(method_name, "GetPosition") == 0)
+    {
+        gchar *response;
+        const gchar *message;
+        g_variant_get (parameters, "(&s)", &message);
+        g_print("%s: %s\n", method_name, message);
+        response = g_strdup_printf("GetRange %s", message);
+        g_dbus_method_invocation_return_value(invocation,
+                g_variant_new("(s)", response));
+    }
+    else g_print("else method_handler\n");
 }
 
 static gboolean handle_set_property (GDBusConnection  *connection,
@@ -86,7 +114,7 @@ static void on_bus_acquired (GDBusConnection *connection,
         gpointer         user_data)
 {
     guint registration_id;
-
+    g_print("on_bus_acquired\n");
     registration_id = g_dbus_connection_register_object (connection,
             "/ros3d/kontroler/Object",
             introspection_data->interfaces[0],
@@ -95,7 +123,7 @@ static void on_bus_acquired (GDBusConnection *connection,
             NULL,  /* user_data_free_func */
             NULL); /* GError** */
     g_assert (registration_id > 0);
-
+    g_print("on_bus_acquired end\n");
 }
 
 static void on_name_acquired (GDBusConnection *connection,
@@ -116,21 +144,22 @@ gint main (gint argc, gchar *argv[])
 {
     GMainLoop *loop;
     guint id;
+    loop = g_main_loop_new(NULL, FALSE);
+
 
     introspection_data = g_dbus_node_info_new_for_xml(introspection_xml, NULL);
     g_assert(introspection_data != NULL);
 
-    id = g_bus_own_name(G_BUS_TYPE_SESSION,
+    //id = g_bus_own_name(G_BUS_TYPE_SESSION,
+    id = g_bus_own_name(G_BUS_TYPE_SYSTEM,
             "ros3d.kontroler.Server",
-            G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT |
-            G_BUS_NAME_OWNER_FLAGS_REPLACE,
+            G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT,
             on_bus_acquired,
             on_name_acquired,
             on_name_lost,
-            loop,
+            NULL,
             NULL);
 
-    loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
     g_bus_unown_name(id);
     g_main_loop_unref(loop);
