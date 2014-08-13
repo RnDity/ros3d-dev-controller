@@ -23,8 +23,8 @@ dbusService_LDADD = $(GIO_LIBS)
 dbusService_CFLAGS = $(GIO_CFLAGS)
 dbusService_SOURCES = dbusService.c
 
-newService_LDADD = $(GIO_LIBS)
-newService_CFLAGS = $(GIO_CFLAGS)
+newService_LDADD = $(GIO_LIBS) $(GLIB_LIBS)
+newService_CFLAGS = $(GIO_CFLAGS) $(GLIB_CFLAGS)
 newService_SOURCES = newService.c
 
 gdbusexampleserver_LDADD = $(GIO_LIBS)
