@@ -8,6 +8,8 @@
 #include <gio/gio.h>
 #include <json-glib/json-glib.h>
 
+GDBusConnection *conn = NULL;
+
 static GDBusNodeInfo *introspection_data = NULL;
 GHashTable * servos_datax;
 GHashTable * servos_datay;
@@ -33,6 +35,9 @@ static const gchar introspection_xml[] =
    "    <method name='GetPosition'>"
    "      <arg type='s' name='message' direction='out'/>"
    "    </method>"
+   "    <signal name='ServoChanged'>"
+   "      <arg type='s' name='message'/>"
+   "    </signal>"
    "  </interface>"
    "</node>";
 
@@ -169,8 +174,7 @@ static gboolean handle_set_property (GDBusConnection  *connection,
             "Hello AGAIN %s. I thought I said writing this property "
             "always results in an error. kthxbye",
             sender);
-
-    return *error = NULL;
+    return *error == NULL;
 }
 
 static GVariant *handle_get_property (GDBusConnection  *connection,
@@ -193,6 +197,44 @@ static const GDBusInterfaceVTable interface_vtable =
     handle_set_property
 };
 
+static void signalNotification(GDBusConnection* connection,
+        const gchar* sender_name,
+        const gchar* object_path,
+        const gchar* interface_name,
+        const gchar* signal_name,
+        GVariant* parameters,
+        gpointer user_data)
+{
+    guchar axis;
+    guint position;
+    g_print("Signal signalNotification recvi\n");
+    g_print("sender_name: %s\n", sender_name);
+    g_print("object_path: %s\n", object_path);
+    g_print("interface_name: %s\n", interface_name);
+    g_print("signal_name: %s\n", signal_name);
+    g_print("params: %s\n" , g_variant_print(parameters, TRUE));
+    //g_variant_get(parameters, "(yu)", &axis, &position);
+    //g_print("axis: %u, pos: %d \n", (unsigned) axis, position);
+    g_print("user_data: %s\n", (const gchar*)user_data);
+}
+
+static void subscribeSignal()
+{
+    g_print("start: subscribeSignnal\n");
+    g_assert (conn != NULL);
+    g_dbus_connection_signal_subscribe(conn,
+                                       "pl.ros3d.servo",
+                                       "pl.ros3d.servo",
+                                       "positionChanged",
+                                       "/pl/ros3d/servo",
+                                       NULL,
+                                       G_DBUS_SIGNAL_FLAGS_NONE,
+                                       signalNotification,
+                                       NULL,
+                                       NULL);
+    g_print("end: subscribeSignnal\n");
+}
+
 static void on_bus_acquired (GDBusConnection *connection,
         const gchar     *name,
         gpointer         user_data)
@@ -207,7 +249,6 @@ static void on_bus_acquired (GDBusConnection *connection,
             NULL,  /* user_data_free_func */
             NULL); /* GError** */
     g_assert (registration_id > 0);
-    g_print("on_bus_acquired end\n");
 }
 
 static void on_name_acquired (GDBusConnection *connection,
@@ -215,6 +256,8 @@ static void on_name_acquired (GDBusConnection *connection,
         gpointer         user_data)
 {
     g_print ("Acquired the name %s\n", name);
+    conn = connection;
+    subscribeSignal();
 }
 
 static void on_name_lost(GDBusConnection *connection,
@@ -227,17 +270,25 @@ static void on_name_lost(GDBusConnection *connection,
 static void init_servos_data()
 {
     servos_datax = g_hash_table_new(g_str_hash, g_str_equal);
-    g_hash_table_insert(servos_datax, "id", "0");
-    g_hash_table_insert(servos_datax, "position", "34");
+    g_hash_table_insert(servos_datax, "id", "1");
+    g_hash_table_insert(servos_datax, "position", "0");
     g_hash_table_insert(servos_datax, "min", "-200");
-    g_hash_table_insert(servos_datax, "max", "320");
+    g_hash_table_insert(servos_datax, "max", "200");
 
     servos_datay = g_hash_table_new(g_str_hash, g_str_equal);
-    g_hash_table_insert(servos_datay, "id", "1");
-    g_hash_table_insert(servos_datay, "position", "44");
-    g_hash_table_insert(servos_datay, "min", "-100");
-    g_hash_table_insert(servos_datay, "max", "220");
+    g_hash_table_insert(servos_datay, "id", "2");
+    g_hash_table_insert(servos_datay, "position", "0");
+    g_hash_table_insert(servos_datay, "min", "-200");
+    g_hash_table_insert(servos_datay, "max", "200");
 }
+
+gboolean callbackSignal(gpointer data)
+{
+    g_print("Hello\n");
+    
+    return TRUE;
+}
+
 
 gint main (gint argc, gchar *argv[])
 {
@@ -245,10 +296,6 @@ gint main (gint argc, gchar *argv[])
     guint id;
     loop = g_main_loop_new(NULL, FALSE);
     init_servos_data();
-    //g_print("servosx keys: %d\n", g_hash_table_size(servos_datax));
-    //g_print("servosy keys: %d\n", g_hash_table_size(servos_datay));
-    g_print("%s\n", g_hash_table_lookup(servos_datax,"id"));
-    g_print("%s\n", g_hash_table_lookup(servos_datay,"id"));
 
     introspection_data = g_dbus_node_info_new_for_xml(introspection_xml, NULL);
     g_assert(introspection_data != NULL);
@@ -262,6 +309,8 @@ gint main (gint argc, gchar *argv[])
             on_name_lost,
             NULL,
             NULL);
+
+    //g_timeout_add_seconds(1, callbackSignal, "EmmitSignal");
 
     g_main_loop_run(loop);
     g_bus_unown_name(id);
