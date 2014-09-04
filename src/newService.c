@@ -32,6 +32,10 @@ static const gchar introspection_xml[] =
    "      <arg type='s' name='message' direction='in'/>"
    "      <arg type='s' name='response' direction='out'/>"
    "    </method>"
+   "    <method name='MoveBy'>"
+   "      <arg type='s' name='message' direction='in'/>"
+   "      <arg type='s' name='response' direction='out'/>"
+   "    </method>"
    "    <method name='GetPosition'>"
    "      <arg type='s' name='message' direction='out'/>"
    "    </method>"
@@ -114,6 +118,38 @@ static void handle_method_call (GDBusConnection       *connection,
         g_dbus_method_invocation_return_value(invocation,
                 g_variant_new("(s)", response));
     }
+    else if(g_strcmp0(method_name, "MoveBy") == 0)
+    {
+        gchar *response;
+        const gchar *message;
+        GHashTable *table;
+
+        g_variant_get (parameters, "(&s)", &message);
+        g_print("message: %s\n", message);
+
+        JsonParser *parser = json_parser_new ();
+        json_parser_load_from_data (parser, message, -1, NULL);
+        JsonReader *reader = json_reader_new (json_parser_get_root (parser));
+
+        json_reader_read_member(reader, "id");
+        gint id = json_reader_get_int_value(reader);
+        json_reader_end_member(reader);
+        if(id == 1) //x servo
+            table = servos_datax;
+        else if(id == 2) //y servo
+            table = servos_datay;
+
+        json_reader_read_member(reader, "moveby");
+        gint moveby = json_reader_get_double_value(reader);
+        json_reader_end_member(reader);
+        //g_hash_table_replace(table, "moveby", g_strdup_printf("%g", position)); 
+        //g_print("MoveBy\n");
+
+        response = g_strdup_printf("{\"moveby\": %d}", moveby);
+        g_dbus_method_invocation_return_value(invocation,
+                g_variant_new("(s)", response));
+    }
+
     else if(g_strcmp0(method_name, "SetPosition") == 0)
     {
         gchar *response;
@@ -272,20 +308,19 @@ static void init_servos_data()
     servos_datax = g_hash_table_new(g_str_hash, g_str_equal);
     g_hash_table_insert(servos_datax, "id", "1");
     g_hash_table_insert(servos_datax, "position", "0");
-    g_hash_table_insert(servos_datax, "min", "-200");
-    g_hash_table_insert(servos_datax, "max", "200");
+    g_hash_table_insert(servos_datax, "min", "0");
+    g_hash_table_insert(servos_datax, "max", "20000");
 
     servos_datay = g_hash_table_new(g_str_hash, g_str_equal);
     g_hash_table_insert(servos_datay, "id", "2");
     g_hash_table_insert(servos_datay, "position", "0");
-    g_hash_table_insert(servos_datay, "min", "-200");
-    g_hash_table_insert(servos_datay, "max", "200");
+    g_hash_table_insert(servos_datay, "min", "0");
+    g_hash_table_insert(servos_datay, "max", "20000");
 }
 
 gboolean callbackSignal(gpointer data)
 {
     g_print("Hello\n");
-    
     return TRUE;
 }
 
@@ -300,7 +335,6 @@ gint main (gint argc, gchar *argv[])
     introspection_data = g_dbus_node_info_new_for_xml(introspection_xml, NULL);
     g_assert(introspection_data != NULL);
 
-    //id = g_bus_own_name(G_BUS_TYPE_SESSION,
     id = g_bus_own_name(G_BUS_TYPE_SYSTEM,
             "ros3d.kontroler.Server",
             G_BUS_NAME_OWNER_FLAGS_ALLOW_REPLACEMENT,
