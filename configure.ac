@@ -1,4 +1,4 @@
-PACKAGE=ros3d-controler
+PACKAGE=ros3d-controller
 VERSION="0.1.0"
 
 AC_INIT(PACKAGE, VERSION)
