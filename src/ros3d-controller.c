@@ -97,9 +97,9 @@ static void handle_method_call (GDBusConnection       *connection,
         json_reader_read_member (reader, "id");
         gint id = json_reader_get_int_value (reader);
         json_reader_end_member (reader);
-        if(id == 0) //x servo
+        if(id == 1) //x servo
             table = servos_datax;
-        else if(id == 1) //y servo
+        else if(id == 2) //y servo
             table = servos_datay;
 
         json_reader_read_member (reader, "max");
