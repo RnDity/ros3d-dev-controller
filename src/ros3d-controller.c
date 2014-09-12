@@ -103,14 +103,14 @@ static void handle_method_call (GDBusConnection       *connection,
             table = servos_datay;
 
         json_reader_read_member (reader, "max");
-        gdouble max = json_reader_get_double_value (reader);
+        gint max = json_reader_get_int_value (reader);
         json_reader_end_member (reader);
-        g_hash_table_replace(table, "max", g_strdup_printf("%g", max)); 
+        g_hash_table_replace(table, "max", g_strdup_printf("%d", max)); 
 
         json_reader_read_member (reader, "min");
-        gdouble min = json_reader_get_double_value (reader);
+        gint min = json_reader_get_int_value (reader);
         json_reader_end_member (reader);
-        g_hash_table_replace(table, "min", g_strdup_printf("%g", min)); 
+        g_hash_table_replace(table, "min", g_strdup_printf("%d", min)); 
 
         response = g_strdup_printf("{\"max\": %s, \"min\": %s}", 
                                     g_hash_table_lookup(table,"max"),
@@ -140,10 +140,13 @@ static void handle_method_call (GDBusConnection       *connection,
             table = servos_datay;
 
         json_reader_read_member(reader, "moveby");
-        gint moveby = json_reader_get_double_value(reader);
+        gint moveby = json_reader_get_int_value(reader);
         json_reader_end_member(reader);
-        //g_hash_table_replace(table, "moveby", g_strdup_printf("%g", position)); 
-        //g_print("MoveBy\n");
+
+        gchar *temp2 = g_hash_table_lookup(table, "position");
+        gint position = atoi(temp2) + moveby;
+        g_hash_table_replace(table, "position", g_strdup_printf("%d", position));
+        g_print("pos:%s\n", g_hash_table_lookup(table, "position")); 
 
         response = g_strdup_printf("{\"moveby\": %d}", moveby);
         g_dbus_method_invocation_return_value(invocation,
@@ -172,9 +175,9 @@ static void handle_method_call (GDBusConnection       *connection,
             table = servos_datay;
 
         json_reader_read_member (reader, "position");
-        gdouble position = json_reader_get_double_value (reader);
+        gint position = json_reader_get_int_value (reader);
         json_reader_end_member (reader);
-        g_hash_table_replace(table, "position", g_strdup_printf("%g", position)); 
+        g_hash_table_replace(table, "position", g_strdup_printf("%d", position)); 
 
         response = g_strdup_printf("{\"position\": %s}", 
                                     g_hash_table_lookup(table,"position"));
