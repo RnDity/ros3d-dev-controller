@@ -111,26 +111,27 @@ statusJson = {
     "ip":getIpAddress(interface)
 }
 
-parametersListJson = {
-    apertureParam.name: {
-        "type" : apertureParam.valueType,
-        "value" : apertureParam.value,
-        "status" : {
-            "read" : apertureParam.status.read,
-            "write" : apertureParam.status.write,
-            "type" : apertureParam.status.statusType
-        }
-    },
-    focusDistanceParam.name: {
-        "type" : focusDistanceParam.valueType,
-        "value" : focusDistanceParam.value,
-        "status" : {
-            "read" : focusDistanceParam.status.read,
-            "write" : focusDistanceParam.status.write,
-            "type" : focusDistanceParam.status.statusType
+def parametersListJson():
+    return {
+        apertureParam.name: {
+            "type" : apertureParam.valueType,
+            "value" : apertureParam.value,
+            "status" : {
+                "read" : apertureParam.status.read,
+                "write" : apertureParam.status.write,
+                "type" : apertureParam.status.statusType
+            }
+        },
+        focusDistanceParam.name: {
+            "type" : focusDistanceParam.valueType,
+            "value" : focusDistanceParam.value,
+            "status" : {
+                "read" : focusDistanceParam.status.read,
+                "write" : focusDistanceParam.status.write,
+                "type" : focusDistanceParam.status.statusType
+            }
         }
     }
-}
 
 class SystemVersionHandler(tornado.web.RequestHandler):
     def get(self):
@@ -147,8 +148,8 @@ class SystemStatusHandler(tornado.web.RequestHandler):
 class ParametersListHandler(tornado.web.RequestHandler):
     def get(self):
         print("ParametersListHandler()")
-        print("ParametersListHandler() Response: %s" % parametersListJson)
-        self.write("%s" % json_encode(parametersListJson))
+        print("ParametersListHandler() Response: %s" % parametersListJson())
+        self.write("%s" % json_encode(parametersListJson()))
 
 class ParametersUpdateHandler(tornado.web.RequestHandler):
     def put(self):
@@ -165,7 +166,7 @@ class ParametersUpdateHandler(tornado.web.RequestHandler):
             print("ParametersUpdateHandler() focusDistanceParam exists")
             updateFocusDistanceValue(json[focusDistanceParam.name][valueKey])
         
-        self.write("%s" % json_encode(parametersListJson))
+        self.write("%s" % json_encode(parametersListJson()))
 
 class ServosCalibrateHandler(tornado.web.RequestHandler):
     def get(self):
