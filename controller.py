@@ -5,7 +5,6 @@ import tornado.ioloop
 from traceback import print_exc
 from tornado.escape import json_encode, json_decode
 import json
-import netifaces
 import gobject
 from dbus.mainloop.glib import DBusGMainLoop
 
@@ -61,6 +60,10 @@ class DBusHandler:
 	handler.add_signal_receiver(self.valueChanged, "valueChanged", 
             DBUS_SERVO_INTERFACE, DBUS_SERVO_SERIVCE, DBUS_SERVO_OBJECT)
 
+    def getValue(self, parameter):
+        print("DBusHandler getValue()")
+        return self.interface.getValue(parameter)
+
     def setValue(self, parameter, value):
         print("DBusHandler setValue()")
         self.interface.setValue(parameter, value)
@@ -79,18 +82,20 @@ dbusApplication = DBusHandler()
 #HELPERS
 def getIpAddress(interface):
     print("getIpAddress()")
-    ip = netifaces.ifaddresses(interface)[2][0]['addr']
+    ip = "not_implemented"
     return ip
 
 def updateApertureValue(value):
     print("updateApertureValue() value %f" % value)
     dbusApplication.setValue(apertureParam.name, dbus.Double(value))
     apertureParam.value = value
+    #apertureParam.value = dbusApplication.getValue(apertureParam.name)
 
 def updateFocusDistanceValue(value):
     print("updateFocusDistanceValue() value %f" % value)
     dbusApplication.setValue(focusDistanceParam.name, dbus.Double(value))
-    focusDistanceParam.value = value
+    focusDistanceParam.value = value;
+    #focusDistanceParam.value = dbusApplication.getValue(focusDistanceParam.name)
 
 def calibrateServos():
     dbusApplication.calibrate(apertureParam.name)
@@ -200,5 +205,8 @@ if __name__ == "__main__":
     webApplication.listen(80)
     tornado.ioloop.IOLoop.instance().start()
  
+    #apertureParam.value = dbusApplication.getValue(apertureParam.name)
+    #focusDistanceParam.value = dbusApplication.getValue(focusDistanceParam.name)
+
     loop = gobject.MainLoop()
     loop.run()   
