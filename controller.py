@@ -29,7 +29,6 @@ focusDistanceParam = DoubleParameter("focus_distance_m", 6.0, "float")
 apertureParam = DoubleParameter("aperture", 30.0, "float")
 
 #DBUS
-
 DBUS_SERVO_SERIVCE = "pl.ros3d.servo"
 DBUS_SERVO_OBJECT = "/pl/ros3d/servo"
 DBUS_SERVO_INTERFACE = "pl.ros3d.servo"
@@ -37,15 +36,6 @@ DBUS_SERVO_INTERFACE = "pl.ros3d.servo"
 class DBusHandler:
     
     interface = 0
-
-    def valueChanged(parameter, motorStatus, limitStatus, inProgressStatus, value):
-        print("DBusHandler value changed() parameter %s: , value: %f" % parameter % value)
-        if(focusDistanceParam.name == parameter):
-            print("DBusHandler valueChanged() focusDistance changed")
-            focusDistanceParam.value = value
-        if(apertureParam.name == parameter):
-            print("DBusHandler valueChanged() aperteure changed")
-            apertureParam.value = value
 
     def connect(self, service, object, interface):
         print("DBusHandler connect()")
@@ -57,8 +47,20 @@ class DBusHandler:
             print_exc()
             sys.exit(1)
         self.interface = dbus.Interface(remoteObject, interface)
-	handler.add_signal_receiver(self.valueChanged, "valueChanged", 
-            DBUS_SERVO_INTERFACE, DBUS_SERVO_SERIVCE, DBUS_SERVO_OBJECT)
+        handler.add_signal_receiver(self.valueChanged,
+            "valueChanged",
+            DBUS_SERVO_INTERFACE,
+            DBUS_SERVO_SERIVCE,
+            DBUS_SERVO_OBJECT)
+
+    def valueChanged(parameter, motorStatus, limitStatus, inProgressStatus, value):
+        print("DBusHandler valueChanged() parameter %s: , value: %f" % parameter % value)
+        if(focusDistanceParam.name == parameter):
+            print("DBusHandler valueChanged() focusDistance changed")
+            focusDistanceParam.value = value
+        if(apertureParam.name == parameter):
+            print("DBusHandler valueChanged() aperteure changed")
+            apertureParam.value = value
 
     def getValue(self, parameter):
         print("DBusHandler getValue()")
@@ -199,6 +201,8 @@ webApplication = tornado.web.Application([
 ])
 
 if __name__ == "__main__":
+    gobject.threads_init()
+
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     dbusApplication.connect(DBUS_SERVO_SERIVCE, DBUS_SERVO_OBJECT, DBUS_SERVO_INTERFACE)
 
