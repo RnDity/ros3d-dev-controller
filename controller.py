@@ -6,7 +6,11 @@ from traceback import print_exc
 from tornado.escape import json_encode, json_decode
 import json
 import gobject
+import time
 from dbus.mainloop.glib import DBusGMainLoop
+from threading import Thread
+from functools import wraps
+import signal
 
 #PARAMETERS 
 class ParameterStatus:
@@ -29,32 +33,34 @@ focusDistanceParam = DoubleParameter("focus_distance_m", 6.0, "float")
 apertureParam = DoubleParameter("aperture", 30.0, "float")
 
 #DBUS
-DBUS_SERVO_SERIVCE = "pl.ros3d.servo"
-DBUS_SERVO_OBJECT = "/pl/ros3d/servo"
-DBUS_SERVO_INTERFACE = "pl.ros3d.servo"
+DBUS_SERVO_SERIVCE = 'pl.ros3d.servo'
+DBUS_SERVO_OBJECT = '/pl/ros3d/servo'
+DBUS_SERVO_INTERFACE = 'pl.ros3d.servo'
 
 class DBusHandler:
-    
-    interface = 0
+
+    busInterface = 0
 
     def connect(self, service, object, interface):
-        print("DBusHandler connect()")
+        print("DBusHandler init()")
         try:
-           handler = dbus.SystemBus()
-           remoteObject = handler.get_object(service, object)
+            bus = dbus.SystemBus()
+            busObject = bus.get_object(service, object)
         except dbus.DBusException:
             print("DBusHandler connect() failed")
             print_exc()
-            sys.exit(1)
-        self.interface = dbus.Interface(remoteObject, interface)
-        handler.add_signal_receiver(self.valueChanged,
-            "valueChanged",
-            DBUS_SERVO_INTERFACE,
-            DBUS_SERVO_SERIVCE,
-            DBUS_SERVO_OBJECT)
+            exitApp()
+        self.busInterface = dbus.Interface(busObject, interface)
+        bus.add_signal_receiver(self.valueChanged, "valueChanged", interface)
+        self.syncData()
 
-    def valueChanged(parameter, motorStatus, limitStatus, inProgressStatus, value):
-        print("DBusHandler valueChanged() parameter %s: , value: %f" % parameter % value)
+    def syncData(self):
+        apertureParam.value = self.getValue(apertureParam.name)
+        focusDistanceParam.value = self.getValue(focusDistanceParam.name)
+
+    def valueChanged(self,  parameter, motor_status, limit_status, in_progress_status, value):
+        print("DBusHandler valueChanged() parameter %s" % parameter)
+        print("DBusHandler valueChanged() value %f" % value)
         if(focusDistanceParam.name == parameter):
             print("DBusHandler valueChanged() focusDistance changed")
             focusDistanceParam.value = value
@@ -64,24 +70,32 @@ class DBusHandler:
 
     def getValue(self, parameter):
         print("DBusHandler getValue()")
-        return self.interface.getValue(parameter)
+        return self.busInterface.getValue(parameter)
 
     def setValue(self, parameter, value):
         print("DBusHandler setValue()")
-        self.interface.setValue(parameter, value)
+        self.busInterface.setValue(parameter, value)
 
     def calibrate(self, parameter):
         print("DBusHandler calibrate()")
-        self.interface.calibrate(parameter)
+        self.busInterface.calibrate(parameter)
 
     def isConnected(self):
         print("DBusHandler isConnected()")
-        return self.interface.isConnected()
-
+        return self.busInterface.isConnected()
 
 dbusApplication = DBusHandler()
 
 #HELPERS
+def runAsync(func):
+    @wraps(func)
+    def async_func(*args, **kwargs):
+        func_hl = Thread(target=func, args=args, kwargs=kwargs)
+        func_hl.start()
+        return func_hl
+
+    return async_func
+
 def getIpAddress(interface):
     print("getIpAddress()")
     ip = "not_implemented"
@@ -90,14 +104,17 @@ def getIpAddress(interface):
 def updateApertureValue(value):
     print("updateApertureValue() value %f" % value)
     dbusApplication.setValue(apertureParam.name, dbus.Double(value))
-    apertureParam.value = value
-    #apertureParam.value = dbusApplication.getValue(apertureParam.name)
+    print("updateApertureVale() value setted, update from hardware now")
+    apertureParam.value = float(dbusApplication.getValue(apertureParam.name))
+    print("updateApertureValue() newValue %f" % apertureParam.value)
+
 
 def updateFocusDistanceValue(value):
     print("updateFocusDistanceValue() value %f" % value)
     dbusApplication.setValue(focusDistanceParam.name, dbus.Double(value))
-    focusDistanceParam.value = value;
-    #focusDistanceParam.value = dbusApplication.getValue(focusDistanceParam.name)
+    print("updateFocusDistanceValue() value setted, update from hardware now")
+    focusDistanceParam.value = float(dbusApplication.getValue(focusDistanceParam.name))
+    print("updateFocusDistanceValue() newValue %f" % focusDistanceParam.value)
 
 def calibrateServos():
     dbusApplication.calibrate(apertureParam.name)
@@ -200,17 +217,47 @@ webApplication = tornado.web.Application([
     (r"/api/servo/connected", ServosConnectedHandler),
 ])
 
-if __name__ == "__main__":
-    gobject.threads_init()
-
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-    dbusApplication.connect(DBUS_SERVO_SERIVCE, DBUS_SERVO_OBJECT, DBUS_SERVO_INTERFACE)
-
+@runAsync
+def startTornado():
+    print("startTornado")
     webApplication.listen(80)
     tornado.ioloop.IOLoop.instance().start()
- 
-    #apertureParam.value = dbusApplication.getValue(apertureParam.name)
-    #focusDistanceParam.value = dbusApplication.getValue(focusDistanceParam.name)
+
+def stopTornado():
+    print("stopTornado")
+    tornado.ioloop.IOLoop.instance().stop()
+
+@runAsync
+def startDbus():
+    print("startDbus")
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
+    dbusApplication.connect(DBUS_SERVO_SERIVCE, DBUS_SERVO_OBJECT, DBUS_SERVO_INTERFACE)
+
+def initParameters():
+    print("initParameters")
+    apertureParam.value = dbusApplication.getValue(apertureParam.name)
+    focusDistanceParam.value = dbusApplication.getValue(focusDistanceParam.name)
+
+def startApp():
+    print("startApp")
+    startTornado()
+    startDbus()
+
+def exitApp():
+    print("exitApp")
+    stopTornado();
+    sys.exit(0)
+
+def exitSignalHandler(signal, frame):
+    print("exitSignalHandler")
+    exitApp();
+
+if __name__ == "__main__":
+    
+    gobject.threads_init()
+    
+    startApp()
+    signal.signal(signal.SIGINT, exitSignalHandler)
 
     loop = gobject.MainLoop()
     loop.run()   
