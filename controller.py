@@ -70,7 +70,7 @@ class DBusHandler:
 
     def getValue(self, parameter):
         print("DBusHandler getValue()")
-        return self.busInterface.getValue(parameter)
+        return float(self.busInterface.getValue(parameter))
 
     def setValue(self, parameter, value):
         print("DBusHandler setValue()")
@@ -105,7 +105,7 @@ def updateApertureValue(value):
     print("updateApertureValue() value %f" % value)
     dbusApplication.setValue(apertureParam.name, dbus.Double(value))
     print("updateApertureVale() value setted, update from hardware now")
-    apertureParam.value = float(dbusApplication.getValue(apertureParam.name))
+    apertureParam.value = dbusApplication.getValue(apertureParam.name)
     print("updateApertureValue() newValue %f" % apertureParam.value)
 
 
@@ -113,7 +113,7 @@ def updateFocusDistanceValue(value):
     print("updateFocusDistanceValue() value %f" % value)
     dbusApplication.setValue(focusDistanceParam.name, dbus.Double(value))
     print("updateFocusDistanceValue() value setted, update from hardware now")
-    focusDistanceParam.value = float(dbusApplication.getValue(focusDistanceParam.name))
+    focusDistanceParam.value = dbusApplication.getValue(focusDistanceParam.name)
     print("updateFocusDistanceValue() newValue %f" % focusDistanceParam.value)
 
 def calibrateServos():
