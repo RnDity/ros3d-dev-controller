@@ -12,11 +12,11 @@ _log = logging.getLogger(__name__)
 
 class ParameterStatus(object):
     """Paramter status wrapper"""
-    STATUS_TYPE_HARDWARE = 'hardware'
-    STATUS_TYPE_SOFTWARE = 'software'
+    HARDWARE = 'hardware'
+    SOFTWARE = 'software'
 
     def __init__(self, read=True, write=True,
-                 status_type=STATUS_TYPE_HARDWARE):
+                 status_type=HARDWARE):
         self.read = read
         self.write = write
         self.status = status_type
