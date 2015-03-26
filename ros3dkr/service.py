@@ -3,6 +3,7 @@
 
 from sparts.vservice import VService
 from ros3dkr.web import WebAPITask
+from ros3dkr.bus import Ros3DDBusTask
 
 
 class Ros3DKRService(VService):
@@ -10,4 +11,5 @@ class Ros3DKRService(VService):
 
     TASKS = [
         WebAPITask,
+        Ros3DDBusTask
     ]
