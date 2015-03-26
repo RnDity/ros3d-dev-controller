@@ -34,21 +34,44 @@ class Parameter(object):
     """System parameter wrapper"""
 
     def __init__(self, name, value, value_type,
-                 status, min_val, max_val):
+                 status=None, min_val=None, max_val=None):
+        """Initialize a parameter
+
+        :param str name: parameter name
+        :param value: parameter value, corresponding to value_type
+        :param typr value_type: type of parameter value
+        :param ParameterStatus status: status info, if None, defaults to a hardware paramter
+        :param min_val: minimum value
+        :param max_val: maximum value
+        """
         self.name = name
         self.value = value
         self.value_type = value_type
-        self.status = status
+
+        if not status:
+            self.status = ParameterStatus(read=True, write=True,
+                                          status_type=ParameterStatus.HARDWARE)
+        else:
+            assert isinstance(status, ParameterStatus)
+            self.status = status
+
         self.min_value = min_val
         self.max_value = max_val
 
     def as_dict(self):
-        """Return a JSON serializable dict"""
-        return {
+        """Return a JSON serializable dict describing the parameter"""
+        ad = {
             "value": self.value,
             "valueType": self.value_type.__name__,
             "status:": self.status.as_dict(),
-            "minValue": self.min_value,
-            "maxValue": self.max_value
         }
+
+        if self.min_value:
+            ad["minValue"] = self.min_value
+        if self.max_value:
+            ad["maxValue"] = self.max_value
+
+        return ad
+
+
 
