@@ -24,16 +24,11 @@ class ParametersStore(object):
     """System parameters store"""
 
     PARAMETERS = {
-        'focus_distance_m' : Parameter('focus_distance_m', 5.0, float,
-                                       ParameterStatus(), 1, 100),
-        'aperture'         : Parameter('aperture', 30.0, float,
-                                       ParameterStatus(), 1, 30),
-        'focal_length_mm'  : Parameter('focal_length_mm', 35, float,
-                                       ParameterStatus(), 1 200),
-        'convergence_deg'  : Parameter('convergence_deg', 0.026, float,
-                                       ParameterStatus(), 0, 100),
-        'baseline_mm'      : Parameter('baseline_mm', 80, float, 80,
-                                       ParameterStatus(), 0, sys.float_info.max)
+        'focus_distance_m' : Parameter('focus_distance_m', 5.0, float),
+        'aperture'         : Parameter('aperture', 30.0, float),
+        'focal_length_mm'  : Parameter('focal_length_mm', 35, float),
+        'convergence_deg'  : Parameter('convergence_deg', 0.026, float),
+        'baseline_mm'      : Parameter('baseline_mm', 80, float)
     }
 
     @classmethod
