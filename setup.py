@@ -7,7 +7,7 @@ import os
 NAME='roskr'
 VERSION = '0.1'
 
-install_requires = ['sparts']
+install_requires = ['sparts', 'pygobject']
 tests_require = []
 
 ROOT = os.path.dirname(__file__)
