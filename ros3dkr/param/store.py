@@ -43,6 +43,47 @@ class ParametersStore(object):
         return params
 
     @classmethod
+    def _find_param(cls, name):
+        """Find parameter in known parameters dict and return a descriptor
+
+        :param str name: parameter name
+        :return: parameter descriptor
+        """
+        # check if paramter is known
+        pdesc = cls.PARAMETERS.get(name, None)
+        if not pdesc:
+            raise KeyError('parameter %s not known' % (name))
+        return pdesc
+
+    @classmethod
+    def _convert(cls, pdesc, value):
+        """Convert a parameter value according to descriptor. Will throw
+        `ValueError` if conversion fails.
+
+        :param pdesc: parameter descriptor
+        :param value: parameter value
+        :return: converted value
+        """
+        # try converting to proper value
+        try:
+            cval = pdesc.value_type(value)
+        except ValueError:
+            raise
+        return cval
+
+    @classmethod
+    def validate(cls, name, value):
+        """Validate that parameter is of correct value
+
+        :param name str: parameter name
+        :param value: parameter value
+        :throws ValueError: if parameter failed to validate
+        """
+        pdesc = cls._find_param(name)
+        # attempt conversion
+        cls._convert(pdesc, value)
+
+    @classmethod
     def set(cls, name, value):
         """Set a parameter, attempts automatic conversion to proper type
 
@@ -52,18 +93,10 @@ class ParametersStore(object):
         :return: True if successful
         """
         _log.debug('set parameter %s to %r', name, value)
-        # check if paramter is known
-        pdesc = cls.PARAMETERS.get(name, None)
-        if not pdesc:
-            raise KeyError('parameter %s not known' % (name))
 
-        # try converting to proper value
-        try:
-            cval = pdesc.value_type(value)
-        except ValueError:
-            raise
-
-        pdesc.value = cval
+        pdesc = cls._find_param(name)
+        pdesc.value = cls._convert(pdesc, value)
+        return True
 
     @classmethod
     def get(cls, name):
