@@ -7,13 +7,11 @@ from __future__ import absolute_import
 
 import logging
 import tornado.web
-from tornado.escape import json_encode, json_decode
+from tornado.escape import json_decode
 from sparts.tasks.tornado import TornadoHTTPTask
 from tornado import gen
 from ros3dkr.param  import ParametersStore
-from functools import wraps
 from ros3dkr.bus.servo import ServoTask, ParamApplyError
-from concurrent.futures import Future
 
 
 _log = logging.getLogger(__name__)
@@ -86,7 +84,7 @@ class SystemVersionHandler(TaskRequestHandler):
 
 class SystemStatusHandler(TaskRequestHandler):
     def get(self):
-        status = { }
+        status = {}
         _log.debug("SystemStatusHandler() Response: %s", status)
         self.write(status)
 
