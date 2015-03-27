@@ -62,6 +62,18 @@ class TaskRequestHandler(tornado.web.RequestHandler):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    def _respond_with_error(self, err):
+        """Respond with error
+        :param APIError error: exception that has been thrown"""
+        _log.exception("caught method error")
+        self.set_status(err.HTTP_CODE)
+        resp = {
+            "code": err.CODE,
+            "reason": str(err)
+        }
+        self.write(resp)
+        self.finish()
+
 
 class SystemVersionHandler(TaskRequestHandler):
     def get(self):
@@ -173,31 +185,19 @@ class ParametersUpdateHandler(TaskRequestHandler):
             self.write(changed_params)
 
         except APIError as err:
-            _log.exception("caught method error")
-            self.set_status(err.HTTP_CODE)
-            resp = {
-                "code": err.CODE,
-                "reason": str(err)
-            }
-            self.write(resp)
-            self.finish()
+            self._respond_with_error(err)
 
 
 class ServosCalibrateHandler(TaskRequestHandler):
     def get(self):
         _log.debug("ServosCalibrateHandler()")
-        calibrateServos()
-        self.write("True")
+        self._respond_with_error(RequestFailedError('Not implemented'))
 
 
 class ServosConnectedHandler(TaskRequestHandler):
     def get(self):
         _log.debug("ServosCalibrateHandler()")
-        isConnected = isServoConnected()
-        if(isConnected == 1):
-	    self.write("True")
-	else:
-	    self.write("False")
+        self._respond_with_error(RequestFailedError('Not implemented'))
 
 
 class WebAPITask(TornadoHTTPTask):
