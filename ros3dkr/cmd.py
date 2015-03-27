@@ -7,7 +7,7 @@ from ros3dkr.param.store import ParameterLoader
 
 def main():
     # load parameters from file
-    ParameterLoader().load()
+    ParameterLoader.load()
     # initialize tasks
     Ros3DKRService.initFromCLI()
 

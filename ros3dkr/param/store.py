@@ -113,7 +113,8 @@ class ParametersStore(object):
 class ParameterLoader(object):
     """Utility class for loading up a paramteres from a set"""
 
-    def load(self):
+    @classmethod
+    def load(cls):
 
         from ros3dkr.param.sysparams import SYSTEM_PARAMETERS
 
