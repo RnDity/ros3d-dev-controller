@@ -3,7 +3,6 @@
 #
 """Utility classes for managing system parameters"""
 
-
 #
 # TODO:
 #
@@ -23,13 +22,18 @@ _log = logging.getLogger(__name__)
 class ParametersStore(object):
     """System parameters store"""
 
-    PARAMETERS = {
-        'focus_distance_m' : Parameter('focus_distance_m', 5.0, float),
-        'aperture'         : Parameter('aperture', 30.0, float),
-        'focal_length_mm'  : Parameter('focal_length_mm', 35, float),
-        'convergence_deg'  : Parameter('convergence_deg', 0.026, float),
-        'baseline_mm'      : Parameter('baseline_mm', 80, float)
-    }
+    PARAMETERS = {}
+
+    @classmethod
+    def load_parameters(cls, params):
+        """Load parameters from list
+
+        :param list params: list of Parameter objects
+        """
+
+        for p in params:
+            assert p.name not in cls.PARAMETERS
+            cls.PARAMETERS[p.name] = p
 
     @classmethod
     def parameters_as_dict(cls):
@@ -72,4 +76,13 @@ class ParametersStore(object):
 
         return pdesc
 
+
+class ParameterLoader(object):
+    """Utility class for loading up a paramteres from a set"""
+
+    def load(self):
+
+        from ros3dkr.param.sysparams import SYSTEM_PARAMETERS
+
+        ParametersStore.load_parameters(SYSTEM_PARAMETERS)
 
