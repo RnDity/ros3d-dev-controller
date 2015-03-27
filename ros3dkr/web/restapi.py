@@ -11,6 +11,7 @@ from tornado.escape import json_encode, json_decode
 from sparts.tasks.tornado import TornadoHTTPTask
 from ros3dkr.param  import ParametersStore
 from functools import wraps
+from ros3dkr.bus.servo import ServoTask
 
 _log = logging.getLogger(__name__)
 
@@ -157,4 +158,16 @@ class WebAPITask(TornadoHTTPTask):
             (r"/api/servo/connected", ServosConnectedHandler, dict(task=self)),
         ]
 
+    def start(self):
+        """Override start method to take reference to servo task."""
+        super(WebAPITask, self).start()
+
+        _log.debug("API task starting")
+
+        self.servo_task = self.service.getTask(ServoTask)
+        _log.debug('servo task: %s', self.servo_task)
+
+    def get_servo(self):
+        """Access servo task"""
+        return self.servo_task
 
