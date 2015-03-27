@@ -5,7 +5,7 @@
 
 from __future__ import absolute_import
 
-from ros3dkr.param.parameter import Parameter, ParameterStatus
+from ros3dkr.param.parameter import Parameter
 
 SYSTEM_PARAMETERS = [
     Parameter('focus_distance_m', 5.0, float),

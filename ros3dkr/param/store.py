@@ -13,8 +13,7 @@
 from __future__ import absolute_import
 
 import logging
-import sys
-from ros3dkr.param.parameter import Parameter, ParameterStatus
+
 
 _log = logging.getLogger(__name__)
 
