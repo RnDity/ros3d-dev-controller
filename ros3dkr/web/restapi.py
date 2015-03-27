@@ -9,9 +9,12 @@ import logging
 import tornado.web
 from tornado.escape import json_encode, json_decode
 from sparts.tasks.tornado import TornadoHTTPTask
+from tornado import gen
 from ros3dkr.param  import ParametersStore
 from functools import wraps
-from ros3dkr.bus.servo import ServoTask
+from ros3dkr.bus.servo import ServoTask, ParamApplyError
+from concurrent.futures import Future
+
 
 _log = logging.getLogger(__name__)
 
@@ -42,26 +45,12 @@ class InvalidDataError(APIError):
     HTTP_CODE = 400
 
 
-def reqhandler(method=None):
-    """Decorator for producing proper response once an API error was caught
-    """
-    @wraps(method)
-    def wrapper(self, *args, **kwargs):
+class RequestFailedError(APIError):
+    """Permission denied when executing a request"""
+    CODE = APIError.ERROR_REQUEST_FAILED
+    HTTP_CODE = 500
 
-        _log.debug('request: %s', self.request)
-        try:
-            return method(self, *args, **kwargs)
-        except APIError as err:
-            _log.debug("caught method error")
-            self.set_status(err.HTTP_CODE)
-            resp = {
-                "code": err.CODE,
-                "reason": str(err)
-            }
-            self.write(resp)
-            self.finish()
 
-    return wrapper
 class TaskRequestHandler(tornado.web.RequestHandler):
     """Helper class for setting up a request handler. Fields from
     parameter dictionary passed as `arg` will be added to class
@@ -98,35 +87,100 @@ class ParametersListHandler(TaskRequestHandler):
         self.write(params)
 
 
-    @reqhandler
-    def put(self):
-        _log.debug("ParametersUpdateHandler() Request: %s", self.request)
 class ParametersUpdateHandler(TaskRequestHandler):
+    def _validate_request(self, data):
+        """Parse and validate request data
 
+        :return: validated dict with request data
+        """
         try:
-            req = json_decode(self.request.body)
+            req = json_decode(data)
         except ValueError:
             _log.exception("failed to decode JSON")
             raise InvalidDataError("JSON decoding error")
 
-        # record changed parameters
-        changed_params = {}
         if not req.items():
             raise InvalidDataError("No request data")
 
         for param, val in req.items():
-            _log.debug('set parameter %s to %s', param, val)
+            _log.debug('validate parameter %s to %s', param, val)
             if 'value' not in val:
                 raise InvalidDataError('Missing \'value\' field')
 
             try:
-                ParametersStore.set(param, val['value'])
+                ParametersStore.validate(param, val['value'])
             except ValueError:
-                raise InvalidDataError("Incorrect value type")
+                _log.exception('failed to validate parameter %s', param)
+                raise InvalidDataError("Incorrect value type of parameter %s" % (param))
+
+        return req
+
+    @gen.coroutine
+    def _apply_parameters(self, req):
+        """Apply parameters that came in request
+
+        :param dict req: dictionary with parameters found in request
+        :return: dict of changed parameters with their values
+        """
+        # record changed parameters
+        changed_params = {}
+
+        # apply parameters serially, note that if any parameter takes
+        # longer to aplly this will contribute to wait time of the
+        # whole request
+        for param, val in req.items():
+            servo = self.task.get_servo()
+            value = val['value']
+            try:
+                if servo and servo.is_active():
+                    applied = yield self.apply_param(param, value)
+                else:
+                    applied = False
+            except ParamApplyError:
+                applied = False
+
+            # param validation was successful and was applied to servo
+            if applied:
+                ParametersStore.set(param, value)
+            else:
+                raise RequestFailedError('Failed to apply parameter %s' % (param))
             par = ParametersStore.get(param)
             changed_params[par.name] = par.as_dict()
 
-        self.write(changed_params)
+        raise gen.Return(changed_params)
+
+    @gen.coroutine
+    def apply_param(self, param, value):
+        """Apply a single parameter
+
+        :return: Future with result"""
+        _log.debug('set servo param')
+        try:
+            res = yield self.task.get_servo().change_param(param, value)
+            _log.debug('apply result: %s', res)
+        except ParamApplyError:
+            _log.exception('error when applying a parameter')
+            res = False
+        raise gen.Return(res)
+
+    @gen.coroutine
+    def put(self):
+        _log.debug("ParametersUpdateHandler() Request: %s", self.request)
+
+        try:
+            req = self._validate_request(self.request.body)
+            changed_params = yield self._apply_parameters(req)
+            self.write(changed_params)
+
+        except APIError as err:
+            _log.exception("caught method error")
+            self.set_status(err.HTTP_CODE)
+            resp = {
+                "code": err.CODE,
+                "reason": str(err)
+            }
+            self.write(resp)
+            self.finish()
 
 
 class ServosCalibrateHandler(TaskRequestHandler):
