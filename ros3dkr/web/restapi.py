@@ -61,9 +61,19 @@ def reqhandler(method=None):
             self.finish()
 
     return wrapper
+class TaskRequestHandler(tornado.web.RequestHandler):
+    """Helper class for setting up a request handler. Fields from
+    parameter dictionary passed as `arg` will be added to class
+    fields
+
+    """
+    def initialize(self, **kwargs):
+        """Implement intialze callback. Append keyword args to class fields"""
+        for k, v in kwargs.items():
+            setattr(self, k, v)
 
 
-class SystemVersionHandler(tornado.web.RequestHandler):
+class SystemVersionHandler(TaskRequestHandler):
     def get(self):
         version = {
             "version": API_VERSION
@@ -72,14 +82,14 @@ class SystemVersionHandler(tornado.web.RequestHandler):
         self.write(version)
 
 
-class SystemStatusHandler(tornado.web.RequestHandler):
+class SystemStatusHandler(TaskRequestHandler):
     def get(self):
         status = { }
         _log.debug("SystemStatusHandler() Response: %s", status)
         self.write(status)
 
 
-class ParametersListHandler(tornado.web.RequestHandler):
+class ParametersListHandler(TaskRequestHandler):
     def get(self):
         params = ParametersStore.parameters_as_dict()
 
@@ -87,10 +97,10 @@ class ParametersListHandler(tornado.web.RequestHandler):
         self.write(params)
 
 
-class ParametersUpdateHandler(tornado.web.RequestHandler):
     @reqhandler
     def put(self):
         _log.debug("ParametersUpdateHandler() Request: %s", self.request)
+class ParametersUpdateHandler(TaskRequestHandler):
 
         try:
             req = json_decode(self.request.body)
@@ -118,14 +128,14 @@ class ParametersUpdateHandler(tornado.web.RequestHandler):
         self.write(changed_params)
 
 
-class ServosCalibrateHandler(tornado.web.RequestHandler):
+class ServosCalibrateHandler(TaskRequestHandler):
     def get(self):
         _log.debug("ServosCalibrateHandler()")
         calibrateServos()
         self.write("True")
 
 
-class ServosConnectedHandler(tornado.web.RequestHandler):
+class ServosConnectedHandler(TaskRequestHandler):
     def get(self):
         _log.debug("ServosCalibrateHandler()")
         isConnected = isServoConnected()
@@ -139,12 +149,12 @@ class WebAPITask(TornadoHTTPTask):
 
     def getApplicationConfig(self):
         return [
-            (r"/api/system/version", SystemVersionHandler),
-            (r"/api/system/status", SystemStatusHandler),
-            (r"/api/parameters/list", ParametersListHandler),
-            (r"/api/parameters/update", ParametersUpdateHandler),
-            (r"/api/servo/calibrate", ServosCalibrateHandler),
-            (r"/api/servo/connected", ServosConnectedHandler),
+            (r"/api/system/version", SystemVersionHandler, dict(task=self)),
+            (r"/api/system/status", SystemStatusHandler, dict(task=self)),
+            (r"/api/parameters/list", ParametersListHandler, dict(task=self)),
+            (r"/api/parameters/update", ParametersUpdateHandler, dict(task=self)),
+            (r"/api/servo/calibrate", ServosCalibrateHandler, dict(task=self)),
+            (r"/api/servo/connected", ServosConnectedHandler, dict(task=self)),
         ]
 
 
