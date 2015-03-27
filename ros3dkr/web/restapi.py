@@ -135,7 +135,7 @@ class ParametersUpdateHandler(TaskRequestHandler):
                 if servo and servo.is_active():
                     applied = yield self.apply_param(param, value)
                 else:
-                    applied = False
+                    applied = True
             except ParamApplyError:
                 applied = False
 
