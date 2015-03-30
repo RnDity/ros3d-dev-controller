@@ -5,6 +5,7 @@
 from __future__ import absolute_import
 
 from sparts.tasks.dbus import DBusTask
+from sparts.sparts import option
 from concurrent.futures import Future
 import glib
 import logging
@@ -37,8 +38,13 @@ class ServoTask(DBusTask):
     object.
     """
 
+    OPT_PREFIX = 'dbus'
+
     SERVO_DBUS_SERVICE = 'pl.ros3d.servo'
     SERVO_DBUS_PATH = '/pl/ros3d/servo'
+
+    session_bus = option(action='store_true', type=bool,
+        default=False, help='Use session bus')
 
     def start(self):
         """Start task. Perform necessary setup:
@@ -48,7 +54,11 @@ class ServoTask(DBusTask):
         """
         _log.debug('starting servo task for service: %s', self.service.name)
         # get bus
-        self.bus = dbus.SessionBus(private=True)
+        if self.session_bus:
+            _log.info('using session bus')
+            self.bus = dbus.SessionBus(private=True)
+        else:
+            self.bus = dbus.SystemBus(private=True)
 
         # proxy to servo service
         self.servo = None
