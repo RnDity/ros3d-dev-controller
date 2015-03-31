@@ -24,10 +24,14 @@ setup(
     packages=find_packages(exclude=['tests', 'tests.*']),
     description="Ros3D KR",
     long_description=read("README.rst"),
-
     install_requires=install_requires,
     tests_require=tests_require,
     author='OpenRnD',
     author_email='ros3d@open-rnd.pl',
     license='closed',
+    entry_points = {
+        'console_scripts': [
+            'ros3dkr = ros3dkr.cmd:main'
+        ]
+    }
 )
