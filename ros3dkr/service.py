@@ -11,6 +11,5 @@ class Ros3DKRService(VService):
 
     TASKS = [
         WebAPITask,
-        Ros3DDBusTask,
         ServoTask
     ]
