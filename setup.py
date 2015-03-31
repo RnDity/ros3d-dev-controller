@@ -31,7 +31,7 @@ setup(
     license='closed',
     entry_points = {
         'console_scripts': [
-            'ros3dkr = ros3dkr.cmd:main'
+            'ros3d-kr = ros3dkr.cmd:main'
         ]
     }
 )
