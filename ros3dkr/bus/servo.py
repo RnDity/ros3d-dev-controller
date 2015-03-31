@@ -37,14 +37,13 @@ class ServoTask(DBusTask):
     `ParamApplyRequest` and `change_param()` returns a `Future()`
     object.
     """
-
-    OPT_PREFIX = 'dbus'
+    OPT_PREFIX = 'servo-dbus'
 
     SERVO_DBUS_SERVICE = 'pl.ros3d.servo'
     SERVO_DBUS_PATH = '/pl/ros3d/servo'
 
     session_bus = option(action='store_true', type=bool,
-        default=False, help='Use session bus')
+        default=False, help='Use session bus to access servo service')
 
     def start(self):
         """Start task. Perform necessary setup:
@@ -55,11 +54,12 @@ class ServoTask(DBusTask):
         _log.debug('starting servo task for service: %s', self.service.name)
         # get bus
         if self.session_bus:
-            _log.info('using session bus')
             self.bus = dbus.SessionBus(private=True)
         else:
             self.bus = dbus.SystemBus(private=True)
 
+        _log.info('using %s bus to access servo',
+                  'session' if self.session_bus else 'system' )
         # proxy to servo service
         self.servo = None
 
