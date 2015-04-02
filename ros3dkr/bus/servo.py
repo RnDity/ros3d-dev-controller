@@ -152,8 +152,8 @@ class ServoTask(DBusTask):
                        request.param, request.value, res)
             # setValue has signature 'by'
             future.set_result(res[0])
-        except dbus.DBusException:
-            _log.exception('error when setting %s -> %s',
+        except Exception as err:
+            _log.exception('error when setting %s -> %s:',
                            request.param, request.value)
             future.set_exception(ParamApplyError('failed to apply parameter'))
 
