@@ -9,17 +9,28 @@ import logging
 import glib
 import dbus
 import avahi
+from ros3dkr.util import get_eth_mac
 
 _log = logging.getLogger(__name__)
 
 
 class ZeroconfTask(DBusTask):
+    """Task for handling of registration with Zeroconf service provider"""
 
-    SERVICE_NAME = 'Ros3D KR API'
+    SERVICE_NAME = 'Ros3D KR API at {mac}'
     SERVICE_TYPE = "_http._tcp"
     SERVICE_PORT = 0
 
-    """Task for handling of registration with Zeroconf service provider"""
+    def __init__(self, *args, **kwargs):
+        super(ZeroconfTask, self).__init__(*args, **kwargs)
+
+        # find MAC address of first ethernet interface
+        eth_mac = get_eth_mac()
+
+        self.logger.debug('device MAC address: %s', eth_mac)
+
+        self.service_name = ZeroconfTask.SERVICE_NAME.format(mac=eth_mac)
+
     def start(self):
         assert self.service.options.http_port, \
             'HTTP port not set'
@@ -65,7 +76,7 @@ class ZeroconfTask(DBusTask):
         group.AddService(avahi.IF_UNSPEC,  # any interface
                          avahi.PROTO_INET, # IPv4
                          dbus.UInt32(0),   # flags
-                         ZeroconfTask.SERVICE_NAME,
+                         self.service_name,
                          ZeroconfTask.SERVICE_TYPE,
                          "", "",
                          dbus.UInt16(ZeroconfTask.SERVICE_PORT),
