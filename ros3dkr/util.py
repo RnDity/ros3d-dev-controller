@@ -5,6 +5,8 @@
 
 import logging
 import ConfigParser
+import os.path
+import os
 
 class ConfigLoader(object):
     """Ros3D system configuration loader"""
@@ -39,3 +41,53 @@ class ConfigLoader(object):
         """Get assigned system"""
         sys_name = self._get('common', 'system', '')
         return sys_name
+
+
+def get_eth_mac():
+    """Find MAC address of the first Ethernet interface. Returns either a
+    string with MAC adress if the interface or 00:00:00:00:00:00.
+    """
+    logger = logging.getLogger(__name__)
+
+    # root of sys-net subsystem
+    sysfs_root = '/sys/class/net'
+
+    # list interface directories
+    dirs = [os.path.join(sysfs_root, d) \
+            for d in os.listdir(sysfs_root)]
+    if not dirs:
+        return None
+    dirs.sort()
+
+    address = None
+    for iface_dir in dirs:
+        # read iface type
+        logger.debug('checking interface %s in %s',
+                     os.path.basename(iface_dir), iface_dir)
+
+        type_file = os.path.join(iface_dir, 'type')
+        with open(type_file) as inf:
+            iface_type = inf.read().strip()
+            logger.debug('iface type: %s', iface_type)
+
+        # Ethernet interface has type '1'
+        if iface_type != '1':
+            continue
+
+        # wifi interface also has type '1', but a phy80211 directory
+        # will exist
+        wifi_dir = os.path.join(iface_dir, 'phy80211')
+        if os.path.exists(wifi_dir):
+            logger.debug('looks like a wifi interface')
+            continue
+
+        with open(os.path.join(iface_dir, 'address')) as af:
+            address = af.read().strip()
+            logger.debug('eth %s MAC address: %s',
+                         os.path.basename(iface_dir), address)
+            break
+
+    if not address:
+        address = '00:00:00:00:00:00'
+
+    return address
