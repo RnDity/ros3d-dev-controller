@@ -41,6 +41,7 @@ class ServoTask(DBusTask):
 
     SERVO_DBUS_SERVICE = 'pl.ros3d.servo'
     SERVO_DBUS_PATH = '/pl/ros3d/servo'
+    SERVO_DBUS_INTERFACE = "pl.ros3d.servo"
 
     session_bus = option(action='store_true', type=bool,
         default=False, help='Use session bus to access servo service')
@@ -101,8 +102,10 @@ class ServoTask(DBusTask):
 
         _log.debug('obtain proxy to servo')
         try:
-            self.servo = self.bus.get_object(ServoTask.SERVO_DBUS_SERVICE,
-                                             ServoTask.SERVO_DBUS_PATH)
+            servo_obj = self.bus.get_object(ServoTask.SERVO_DBUS_SERVICE,
+                                            ServoTask.SERVO_DBUS_PATH)
+            self.servo = dbus.Interface(servo_obj,
+                                        ServoTask.SERVO_DBUS_INTERFACE)
         except dbus.DBusException:
             _log.exception('failed to obtain proxy to servo')
         else:
