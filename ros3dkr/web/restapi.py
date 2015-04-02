@@ -199,6 +199,7 @@ class ServosConnectedHandler(TaskRequestHandler):
 
 
 class WebAPITask(TornadoHTTPTask):
+    DEFAULT_PORT = 8090
 
     def getApplicationConfig(self):
         return [
