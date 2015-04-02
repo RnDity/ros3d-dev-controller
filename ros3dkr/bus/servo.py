@@ -47,6 +47,10 @@ class ServoTask(DBusTask):
         default=False, help='Use session bus to access servo service')
 
     def start(self):
+        self.asyncRun(self._start_servo)
+        super(ServoTask, self).start()
+
+    def _start_servo(self):
         """Start task. Perform necessary setup:
         - bus connection
         - setup servo service name monitoring
@@ -72,7 +76,6 @@ class ServoTask(DBusTask):
         self.bus.watch_name_owner(ServoTask.SERVO_DBUS_SERVICE,
                                   self._servo_name_changed)
 
-        super(ServoTask, self).start()
 
     def stop(self):
         """Stop task"""
