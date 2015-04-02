@@ -6,6 +6,7 @@ from sparts.sparts import option
 from ros3dkr.web import WebAPITask
 from ros3dkr.bus import Ros3DDBusTask
 from ros3dkr.bus.servo import ServoTask
+from ros3dkr.bus.zeroconf import ZeroconfTask
 from ros3dkr.util import ConfigLoader
 
 class Ros3DKRService(VService):
@@ -13,7 +14,8 @@ class Ros3DKRService(VService):
 
     TASKS = [
         WebAPITask,
-        ServoTask
+        ServoTask,
+        ZeroconfTask
     ]
 
     config_file = option(default=ConfigLoader.DEFAULT_PATH,
