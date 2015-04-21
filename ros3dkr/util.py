@@ -44,6 +44,11 @@ class ConfigLoader(object):
         sys_name = self._get('common', 'system', '')
         return sys_name
 
+    def set_system(self, value):
+        if not self.config.has_section('common'):
+            self.config.add_section('common')
+        self.config.set('common', 'system', value)
+
     @classmethod
     def set_config_location(cls, path):
         cls.logger.debug('setting config path to %s', path)
