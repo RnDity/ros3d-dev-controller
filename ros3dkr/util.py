@@ -49,6 +49,18 @@ class ConfigLoader(object):
             self.config.add_section('common')
         self.config.set('common', 'system', value)
 
+    def write(self):
+        import tempfile
+        import shutil
+
+        fd, path = tempfile.mkstemp()
+        self.logger.debug('writing config to temp file: %s', path)
+        with os.fdopen(fd, 'w') as outf:
+            self.config.write(outf)
+
+        self.logger.debug('replacing %s', ConfigLoader.CONFIG_PATH)
+        shutil.move(path, ConfigLoader.CONFIG_PATH)
+
     @classmethod
     def set_config_location(cls, path):
         cls.logger.debug('setting config path to %s', path)
