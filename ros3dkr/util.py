@@ -12,11 +12,13 @@ class ConfigLoader(object):
     """Ros3D system configuration loader"""
 
     DEFAULT_PATH = '/etc/ros3d.conf'
+    CONFIG_PATH = DEFAULT_PATH
+
+    logger = logging.getLogger(__name__)
 
     def __init__(self, path=None):
-        self.logger = logging.getLogger(__name__)
         self.config = None
-        self._load_config(path if path else ConfigLoader.DEFAULT_PATH)
+        self._load_config(path if path else ConfigLoader.CONFIG_PATH)
 
     def _load_config(self, path):
         """Load configuration from file given by `path`"""
@@ -41,6 +43,11 @@ class ConfigLoader(object):
         """Get assigned system"""
         sys_name = self._get('common', 'system', '')
         return sys_name
+
+    @classmethod
+    def set_config_location(cls, path):
+        cls.logger.debug('setting config path to %s', path)
+        cls.CONFIG_PATH = path
 
 
 def get_eth_mac():
