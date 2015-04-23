@@ -17,11 +17,31 @@ import logging
 
 _log = logging.getLogger(__name__)
 
+class ParametersStoreListener(object):
+    """Class for notifying other modules about any changes in parameters"""
+
+    def __init__(self):
+        self.__handlers = []
+
+    def add(self, handler):
+        self.__handlers.append(handler)
+        return self
+
+    def remove(self, handler):
+        self.__handlers.remove(handler)
+        return self
+
+    def fire(self, *args, **keywargs):
+        for handler in self.__handlers:
+            handler(*args, **keywargs)
+
 
 class ParametersStore(object):
     """System parameters store"""
 
     PARAMETERS = {}
+
+    change_listeners = ParametersStoreListener()
 
     @classmethod
     def load_parameters(cls, params):
@@ -118,4 +138,3 @@ class ParameterLoader(object):
         from ros3dkr.param.sysparams import SYSTEM_PARAMETERS
 
         ParametersStore.load_parameters(SYSTEM_PARAMETERS)
-
