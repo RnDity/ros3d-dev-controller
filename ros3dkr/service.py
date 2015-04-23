@@ -8,6 +8,7 @@ from ros3dkr.bus import Ros3DDBusTask
 from ros3dkr.bus.servo import ServoTask
 from ros3dkr.bus.zeroconf import ZeroconfTask
 from ros3dkr.util import ConfigLoader
+from ros3dkr.mqtt import MQTTTask
 
 class Ros3DKRService(VService):
     """Ros3D KR services wrapper"""
@@ -15,7 +16,8 @@ class Ros3DKRService(VService):
     TASKS = [
         WebAPITask,
         ServoTask,
-        ZeroconfTask
+        ZeroconfTask,
+        MQTTTask
     ]
 
     config_file = option(default=ConfigLoader.DEFAULT_PATH,
