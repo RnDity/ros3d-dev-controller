@@ -13,7 +13,6 @@ import paho.mqtt.client as mqtt
 import logging
 
 from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter 
-from ros3dkr.param  import ParametersStore
 
 _log = logging.getLogger(__name__)
 
@@ -79,6 +78,6 @@ class MQTTTask(TornadoTask):
          self.adapter = None
          self._schedule_reconnect()
 
-    def param_changed(param):
-        _log.debug('param_changed')
-        #TODO: Publish to MQTT
+    def param_changed(self, param):
+        _log.debug('param_changed %s', param.as_dict())
+        self.client.publish("parameters", param.as_dict())
