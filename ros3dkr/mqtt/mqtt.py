@@ -12,7 +12,8 @@ from ros3dkr.param  import ParametersStore
 import paho.mqtt.client as mqtt
 import logging
 
-from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter
+from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter 
+from ros3dkr.param  import ParametersStore
 
 _log = logging.getLogger(__name__)
 
@@ -32,23 +33,25 @@ class MQTTTask(TornadoTask):
         self.client.on_disconnect = self._on_disconnect
 
     def start(self):
-        self.logger.debug('start')
-        self._try_connect()       
+        _log.debug('start')
+        self._try_connect()
+        ParametersStore.change_listeners.add(self.param_changed)
 
     def stop(self):
-        self.logger.debug('stop')
+        _log.debug('stop')
+        ParametersStore.change_listeners.remove(self.param_changed)
 
     def _try_connect(self):
         """Attempt connection, if not schedule a reconnect after  timeout  """
-        self.logger.debug('trying to connect to %s:%d', self.host, self.port)
+        _log.debug('_try_connect')
         try:
             self._connect()
         except socket.error:
-            self.logger.debug('failed to connect')
+            _log.error('failed to connect')
             self._schedule_reconnect()
 
     def _connect(self):
-        self.logger.debug('connect')
+        _log.debug('_connect')
         self.client.connect(self.host, self.port)
         self.adapter = MQTTornadoAdapter(self.client)
 
@@ -57,22 +60,25 @@ class MQTTTask(TornadoTask):
         # reconnect after 10s
         timeout = 10
 
-        self.logger.debug('reconnect after %d seconds', timeout)
+        _log.debug('reconnect after %d seconds', timeout)
        
         loop = self.ioloop
         loop.add_timeout(loop.time() + timeout, self._try_connect)
 
     def _on_connect(self, client, userdata, flags, rc):
         """CONNACK received"""
-        self.log.debug('connected: %s', mqtt.connack_string(rc))
-        self.log.debug('flags: %s', flags)
-
+        _log.debug('connected: %s', mqtt.connack_string(rc))
+        _log.debug('flags: %s', flags)
         self.adapter.poll_writes()
 
     def _on_disconnect(self, client, userdata, rc):
          """DISCONNECT received"""
-         self.log.debug('disconnected: %s', mqtt.connack_string(rc))
+         _log.debug('disconnected: %s', mqtt.connack_string(rc))
 
          self.adapter.stop()
          self.adapter = None
          self._schedule_reconnect()
+
+    def param_changed(param):
+        _log.debug('param_changed')
+        #TODO: Publish to MQTT
