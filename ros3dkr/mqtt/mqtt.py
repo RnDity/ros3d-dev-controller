@@ -7,12 +7,12 @@ from __future__ import absolute_import
 from sparts.tasks.tornado import TornadoTask
 from sparts.sparts import option
 
+from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter 
 from ros3dkr.param  import ParametersStore
 
 import paho.mqtt.client as mqtt
 import logging
-
-from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter 
+import glib
 
 _log = logging.getLogger(__name__)
 
@@ -38,6 +38,9 @@ class MQTTTask(TornadoTask):
 
     def stop(self):
         _log.debug('stop')
+        if not (self.adapter is None):
+            self.adapter.stop()
+        #self.client.disconnect()
         ParametersStore.change_listeners.remove(self.param_changed)
 
     def _try_connect(self):
@@ -80,4 +83,8 @@ class MQTTTask(TornadoTask):
 
     def param_changed(self, param):
         _log.debug('param_changed %s', param.as_dict())
-        self.client.publish("parameters", param.as_dict())
+        self.ioloop.add_callback(self._publish_param, param)
+
+    def _publish_param(self, param):
+       _log.debug('publish param %s', param.as_dict())
+       self.client.publish("parameters", str(param.as_dict()))
