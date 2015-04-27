@@ -38,6 +38,7 @@ class ParametersStoreListener(object):
 
     def fire(self, *args, **keywargs):
         for handler in self.__handlers:
+            _log.debug('callling %r', handler)
             handler(*args, **keywargs)
 
 
