@@ -24,8 +24,11 @@ class ParametersStoreListener(object):
         self.__handlers = []
 
     def add(self, handler):
-        self.__handlers.append(handler)
-        return self
+        if handler not in self.__handlers:
+            _log.debug('registering %r handler', handler)
+            self.__handlers.append(handler)
+        else:
+            _log.warning('handler %r already registered', handler)
 
     def remove(self, handler):
         try:
