@@ -113,7 +113,12 @@ class ParametersUpdateHandler(TaskRequestHandler):
             raise InvalidDataError("No request data")
 
         for param, val in req.items():
-            _log.debug('validate parameter %s to %s', param, val)
+            _log.debug('validate parameter %s to %s (type: %s)', param,
+                       val, type(val))
+
+            if not isinstance(val, dict):
+                raise InvalidDataError('Incorrect \'value\' field')
+
             if 'value' not in val:
                 raise InvalidDataError('Missing \'value\' field')
 
