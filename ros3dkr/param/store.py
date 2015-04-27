@@ -28,8 +28,10 @@ class ParametersStoreListener(object):
         return self
 
     def remove(self, handler):
-        self.__handlers.remove(handler)
-        return self
+        try:
+            self.__handlers.remove(handler)
+        except ValueError:
+            _log.warning('handler %r was not registered', handler)
 
     def fire(self, *args, **keywargs):
         for handler in self.__handlers:
