@@ -23,6 +23,7 @@ class MQTTTask(TornadoTask):
     OPT_PREFIX = 'mqtt'
     port = option(default=1883, help='Broker port')
     host = option(default='localhost', help='Broker host address')
+    topic = option(default='/parameters', help='Parameters topic')
 
     def __init__(self, *args, **kwargs):
         super(MQTTTask, self).__init__(*args, **kwargs)
@@ -91,4 +92,5 @@ class MQTTTask(TornadoTask):
 
     def _publish_param(self, param):
         as_json = json_encode(param)
-        self.client.publish("parameters", as_json)
+        _log.debug('publish to %s: %s', self.topic, as_json)
+        self.client.publish(self.topic, as_json)
