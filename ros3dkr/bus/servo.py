@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from sparts.tasks.dbus import DBusTask
 from sparts.sparts import option
 from concurrent.futures import Future
+from ros3dkr.param.store import ParametersStore
 import glib
 import logging
 import dbus
@@ -119,6 +120,8 @@ class ServoTask(DBusTask):
     def _servo_value_changed(self, parameter, motor, limit, in_progress, value):
         """pl.ros3d.servo.valueChanged signal handler"""
         _log.debug('got signal for parameter %s, value: %d', parameter, value)
+        ParametersStore.set(parameter, value)
+        _log.debug('parameter value updated')
 
     def change_param(self, param, value):
         """Attempt to set a parameter is servo. Does a trampoline through the
