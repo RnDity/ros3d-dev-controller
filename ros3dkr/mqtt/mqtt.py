@@ -34,7 +34,7 @@ class MQTTTask(TornadoTask):
 
     def start(self):
         _log.debug('start')
-        self._try_connect()
+        self.ioloop.add_callback(self._try_connect)
         ParametersStore.change_listeners.add(self.param_changed)
 
     def stop(self):
