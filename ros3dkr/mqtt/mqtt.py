@@ -6,6 +6,7 @@
 from __future__ import absolute_import
 from sparts.tasks.tornado import TornadoTask
 from sparts.sparts import option
+from tornado.escape import json_encode
 
 from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter
 from ros3dkr.param  import ParametersStore
@@ -85,9 +86,9 @@ class MQTTTask(TornadoTask):
          self._schedule_reconnect()
 
     def param_changed(self, param):
-        _log.debug('param_changed %s', param.as_dict())
+        _log.debug('param_changed %s', param)
         self.ioloop.add_callback(self._publish_param, param)
 
     def _publish_param(self, param):
-       _log.debug('publish param %s', param.as_dict())
-       self.client.publish("parameters", str(param.as_dict()))
+        as_json = json_encode(param)
+        self.client.publish("parameters", as_json)
