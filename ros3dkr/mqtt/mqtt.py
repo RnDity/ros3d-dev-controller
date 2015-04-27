@@ -46,15 +46,15 @@ class MQTTTask(TornadoTask):
 
     def _try_connect(self):
         """Attempt connection, if not schedule a reconnect after  timeout  """
-        _log.debug('_try_connect')
+        _log.debug('try connecting to broker')
         try:
             self._connect()
         except socket.error:
-            _log.error('failed to connect')
+            _log.warning('failed to connect')
             self._schedule_reconnect()
 
     def _connect(self):
-        _log.debug('_connect')
+        _log.debug('connect to %s:%d', self.host, int(self.port))
         self.client.connect(self.host, self.port)
         self.adapter = MQTTornadoAdapter(self.client)
 
@@ -64,8 +64,10 @@ class MQTTTask(TornadoTask):
         timeout = 10
 
         _log.debug('reconnect after %d seconds', timeout)
-       
+
         loop = self.ioloop
+        _log.debug('reconnect at %d (now %d)',
+                   loop.time() + timeout, loop.time())
         loop.add_timeout(loop.time() + timeout, self._try_connect)
 
     def _on_connect(self, client, userdata, flags, rc):
