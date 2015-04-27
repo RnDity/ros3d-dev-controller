@@ -62,7 +62,7 @@ class Parameter(object):
         """Return a JSON serializable dict describing the parameter"""
         ad = {
             "value": self.value,
-            "valueType": self.value_type.__name__,
+            "type": self.value_type.__name__,
             "status:": self.status.as_dict(),
         }
 
