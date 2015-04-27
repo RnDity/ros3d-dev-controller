@@ -7,11 +7,12 @@ from __future__ import absolute_import
 from sparts.tasks.tornado import TornadoTask
 from sparts.sparts import option
 
-from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter 
+from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter
 from ros3dkr.param  import ParametersStore
 
 import paho.mqtt.client as mqtt
 import logging
+import socket
 import glib
 
 _log = logging.getLogger(__name__)
