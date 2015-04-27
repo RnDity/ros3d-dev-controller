@@ -20,8 +20,8 @@ _log = logging.getLogger(__name__)
 class MQTTTask(TornadoTask):
 
     OPT_PREFIX = 'mqtt'
-    port = option(default = 1883, help = 'Broker port')
-    host = option(default = 'localhost', help = 'Broker host address')
+    port = option(default=1883, help='Broker port')
+    host = option(default='localhost', help='Broker host address')
 
     def __init__(self, *args, **kwargs):
         super(MQTTTask, self).__init__(*args, **kwargs)
