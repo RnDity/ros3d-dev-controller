@@ -21,14 +21,6 @@ class ParameterStatus(object):
         self.write = write
         self.status = status_type
 
-    def as_dict(self):
-        """Return a JSON serializable dict"""
-        return {
-            'read': bool(self.read),
-            'write': bool(self.write),
-            'status': str(self.status)
-        }
-
 
 class Parameter(object):
     """System parameter wrapper"""
@@ -57,21 +49,3 @@ class Parameter(object):
 
         self.min_value = min_val
         self.max_value = max_val
-
-    def as_dict(self):
-        """Return a JSON serializable dict describing the parameter"""
-        ad = {
-            "value": self.value,
-            "type": self.value_type.__name__,
-            "status:": self.status.as_dict(),
-        }
-
-        if self.min_value:
-            ad["minValue"] = self.min_value
-        if self.max_value:
-            ad["maxValue"] = self.max_value
-
-        return ad
-
-
-
