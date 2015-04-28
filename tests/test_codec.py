@@ -8,17 +8,20 @@ import json
 import logging
 
 from ros3dkr.param.parameter import Parameter
-from ros3dkr.web.codec import ParameterCodec
+from ros3dkr.web.codec import ParameterCodec, ParameterCodecError
 
 _log = logging.getLogger(__name__)
 
 class CodecTestCase(unittest.TestCase):
 
+    def setUp(self):
+        self.codec = ParameterCodec(as_set=True)
+
     def test_encode_single(self):
         p = Parameter('foo', 'bar', str)
 
         # this should produce a valid json
-        enc = ParameterCodec(as_set=True).encode(p)
+        enc = self.codec.encode(p)
         _log.debug('encoded: %s', enc)
 
         try:
@@ -49,7 +52,7 @@ class CodecTestCase(unittest.TestCase):
         ]
 
         # this should produce a valid json
-        enc = ParameterCodec(as_set=True).encode(params)
+        enc = self.codec.encode(params)
         _log.debug('encoded: %s', enc)
 
         try:
@@ -68,9 +71,7 @@ class CodecTestCase(unittest.TestCase):
             "value": 10
         }
         }'''
-        dec = ParameterCodec(as_set=True)
-
-        params = dec.decode(single)
+        params = self.codec.decode(single)
 
         self.assertIsInstance(params, list)
         self.assertEqual(len(params), 1)
@@ -88,9 +89,8 @@ class CodecTestCase(unittest.TestCase):
             "value": 0.5
         }
         }'''
-        dec = ParameterCodec(as_set=True)
 
-        params = dec.decode(single)
+        params = self.codec.decode(single)
 
         self.assertIsInstance(params, list)
         self.assertEqual(len(params), 2)
@@ -104,8 +104,35 @@ class CodecTestCase(unittest.TestCase):
             self.assertTrue(pdesc.name in expected)
             self.assertEqual(pdesc.value, expected[pdesc.name])
 
+    def test_decode_fail_empty_object(self):
+        # pass JSON with emtpy object to decoder
+        single = '''{
+        }'''
 
+        self.assertRaises(ParameterCodecError, self.codec.decode,
+                          single)
 
+    def test_decode_fail_empty(self):
+        # pass invalid JSON to decoder
+        single = ''
 
+        self.assertRaises(ParameterCodecError, self.codec.decode,
+                          single)
 
+    def test_decode_fail_param_empty(self):
+        # pass invalid JSON to decoder
+        single = '''{
+            "foo": {}
+        }'''
 
+        self.assertRaises(ParameterCodecError, self.codec.decode,
+                          single)
+
+    def test_decode_fail_param_not_dict(self):
+        # pass invalid JSON to decoder
+        single = '''{
+            "foo": []
+        }'''
+
+        self.assertRaises(ParameterCodecError, self.codec.decode,
+                          single)
