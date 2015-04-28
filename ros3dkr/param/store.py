@@ -63,6 +63,11 @@ class ParametersStore(object):
             cls.PARAMETERS[p.name] = p
 
     @classmethod
+    def clear_parameters(cls):
+        """Remove all parameters"""
+        cls.PARAMETERS = {}
+
+    @classmethod
     def parameters_as_dict(cls):
         params = {}
         for pname, pp in cls.PARAMETERS.items():
