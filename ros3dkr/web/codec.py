@@ -89,7 +89,7 @@ class ParameterCodec(object):
             raise ParameterCodecError('Request not an object')
 
         if not req.items():
-            raise InvalidDataError("No request data")
+            raise ParameterCodecError("No request data")
 
         params = []
         for param, val in req.items():
@@ -97,10 +97,10 @@ class ParameterCodec(object):
                        val, type(val))
 
             if not isinstance(val, dict):
-                raise InvalidDataError('Incorrect \'value\' field')
+                raise ParameterCodecError('Incorrect \'value\' field')
 
             if 'value' not in val:
-                raise InvalidDataError('Missing \'value\' field')
+                raise ParameterCodecError('Missing \'value\' field')
 
             params.append(parameter.Parameter(param, val['value'],
                           type(val['value'])))
