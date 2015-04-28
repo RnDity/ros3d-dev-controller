@@ -136,7 +136,7 @@ class ParametersStore(object):
 
         pdesc = cls._find_param(name)
         pdesc.value = cls._convert(pdesc, value)
-        cls.change_listeners.fire({ name: pdesc.as_dict() })
+        cls.change_listeners.fire(pdesc)
         return True
 
     @classmethod

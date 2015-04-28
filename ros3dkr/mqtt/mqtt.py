@@ -6,9 +6,9 @@
 from __future__ import absolute_import
 from sparts.tasks.tornado import TornadoTask
 from sparts.sparts import option
-from tornado.escape import json_encode
 
 from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter
+from ros3dkr.web.codec import ParameterCodec
 from ros3dkr.param  import ParametersStore
 
 import paho.mqtt.client as mqtt
@@ -91,6 +91,6 @@ class MQTTTask(TornadoTask):
         self.ioloop.add_callback(self._publish_param, param)
 
     def _publish_param(self, param):
-        as_json = json_encode(param)
+        as_json = ParameterCodec(as_set=True).encode(param)
         _log.debug('publish to %s: %s', self.topic, as_json)
         self.client.publish(self.topic, as_json)
