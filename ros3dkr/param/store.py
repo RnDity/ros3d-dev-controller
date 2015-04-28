@@ -12,6 +12,8 @@
 
 from __future__ import absolute_import
 
+from ros3dkr.param.parameter import Parameter
+
 import logging
 
 
@@ -107,6 +109,19 @@ class ParametersStore(object):
         pdesc = cls._find_param(name)
         # attempt conversion
         cls._convert(pdesc, value)
+
+    @classmethod
+    def validate_desc(cls, desc):
+        """Validate that parameter passed as Parameter instance has correct
+        value. Aside from same exceptions as validate(), also throws
+        an AssertError.
+
+        :throws AssertError: desc is not a Parameter() instance
+        """
+        assert isinstance(desc, Parameter)
+        pdesc = cls._find_param(desc.name)
+        # attempt conversion
+        cls._convert(pdesc, desc.value)
 
     @classmethod
     def set(cls, name, value):
