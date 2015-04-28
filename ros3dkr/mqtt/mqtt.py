@@ -78,12 +78,12 @@ class MQTTTask(TornadoTask):
         self.adapter.poll_writes()
 
     def _on_disconnect(self, client, userdata, rc):
-         """DISCONNECT received"""
-         _log.debug('disconnected: %s', mqtt.connack_string(rc))
+        """DISCONNECT received"""
+        _log.debug('disconnected: %s', mqtt.connack_string(rc))
 
-         self.adapter.stop()
-         self.adapter = None
-         self._schedule_reconnect()
+        self.adapter.stop()
+        self.adapter = None
+        self._schedule_reconnect()
 
     def param_changed(self, param):
         _log.debug('param_changed %s', param)
