@@ -40,7 +40,7 @@ class MQTTTask(TornadoTask):
 
     def stop(self):
         _log.debug('stop')
-        if not (self.adapter is None):
+        if self.adapter is not None:
             self.adapter.stop()
         #self.client.disconnect()
         ParametersStore.change_listeners.remove(self.param_changed)
