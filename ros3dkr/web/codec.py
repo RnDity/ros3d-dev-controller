@@ -35,7 +35,7 @@ class ParameterCodec(object):
         ad = {
             "value": param.value,
             "type": param.value_type.__name__,
-            "status:": ParameterCodec.status_as_dict(param.status),
+            "status": ParameterCodec.status_as_dict(param.status),
         }
 
         if param.min_value:
@@ -49,7 +49,7 @@ class ParameterCodec(object):
     def encode(self, param):
         """Encode parameter to REST API representation"""
         if not self.as_set:
-            raise NotImplemented('single parameter encoder not supported')
+            raise NotImplementedError('single parameter encoder not supported')
 
         if not isinstance(param, list):
             param_list = [param]
@@ -74,7 +74,7 @@ class ParameterCodec(object):
 
     def decode(self, data):
         if not self.as_set:
-            raise NotImplemented('single parameter decoder not supported')
+            raise NotImplementedError('single parameter decoder not supported')
 
         return self.decode_list(data)
 
