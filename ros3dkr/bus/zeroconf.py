@@ -6,7 +6,6 @@ from __future__ import absolute_import
 
 from sparts.tasks.dbus import DBusTask
 import logging
-import glib
 import dbus
 import avahi
 from ros3dkr.util import get_eth_mac
@@ -30,6 +29,9 @@ class ZeroconfTask(DBusTask):
         self.logger.debug('device MAC address: %s', eth_mac)
 
         self.service_name = ZeroconfTask.SERVICE_NAME.format(mac=eth_mac)
+        self.server = None
+        self.group = None
+        self.bus = None
 
     def start(self):
         assert self.service.options.http_port, \
@@ -45,7 +47,7 @@ class ZeroconfTask(DBusTask):
         avahi_obj = self.bus.get_object(avahi.DBUS_NAME,
                                         avahi.DBUS_PATH_SERVER)
         self.server = dbus.Interface(avahi_obj,
-                                    avahi.DBUS_INTERFACE_SERVER)
+                                     avahi.DBUS_INTERFACE_SERVER)
         self.server.connect_to_signal('StateChanged',
                                       self._server_state_changed)
         self._server_state_changed(self.server.GetState())
