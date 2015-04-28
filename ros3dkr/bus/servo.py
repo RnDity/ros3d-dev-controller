@@ -45,7 +45,14 @@ class ServoTask(DBusTask):
     SERVO_DBUS_INTERFACE = "pl.ros3d.servo"
 
     session_bus = option(action='store_true', type=bool,
-        default=False, help='Use session bus to access servo service')
+                         default=False,
+                         help='Use session bus to access servo service')
+
+    def __init__(self, *args, **kwargs):
+        super(ServoTask, self).__init__(*args, **kwargs)
+
+        self.bus = None
+        self.servo = None
 
     def start(self):
         self.asyncRun(self._start_servo)
@@ -65,7 +72,7 @@ class ServoTask(DBusTask):
             self.bus = dbus.SystemBus(private=True)
 
         _log.info('using %s bus to access servo',
-                  'session' if self.session_bus else 'system' )
+                  'session' if self.session_bus else 'system')
         # proxy to servo service
         self.servo = None
 
@@ -159,6 +166,7 @@ class ServoTask(DBusTask):
             # setValue has signature 'by'
             future.set_result(res[0])
         except Exception as err:
+            # TODO: catch DBus exception instead of Exception
             _log.exception('error when setting %s -> %s:',
                            request.param, request.value)
             future.set_exception(ParamApplyError('failed to apply parameter'))
