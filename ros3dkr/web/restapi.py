@@ -112,8 +112,8 @@ class ParametersUpdateHandler(TaskRequestHandler):
             try:
                 ParametersStore.validate_desc(param)
             except ValueError:
-                _log.exception('failed to validate parameter %s', param)
-                raise InvalidDataError("Incorrect value type of parameter %s" % (param))
+                _log.exception('failed to validate parameter %s', param.name)
+                raise InvalidDataError("Incorrect value type of parameter %s" % (param.name))
 
         return req
 
@@ -146,7 +146,7 @@ class ParametersUpdateHandler(TaskRequestHandler):
             if applied:
                 ParametersStore.set(name, value)
             else:
-                raise RequestFailedError('Failed to apply parameter %s' % (param))
+                raise RequestFailedError('Failed to apply parameter %s' % (name))
             par = ParametersStore.get(name)
             changed_params.append(par)
 
