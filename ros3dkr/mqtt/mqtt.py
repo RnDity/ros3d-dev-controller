@@ -14,7 +14,6 @@ from ros3dkr.param  import ParametersStore
 import paho.mqtt.client as mqtt
 import logging
 import socket
-import glib
 
 _log = logging.getLogger(__name__)
 
