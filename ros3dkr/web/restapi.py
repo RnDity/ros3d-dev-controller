@@ -12,7 +12,7 @@ from sparts.tasks.tornado import TornadoHTTPTask
 from tornado import gen
 from ros3dkr.param  import ParametersStore
 from ros3dkr.bus.servo import ServoTask, ParamApplyError
-
+from ros3dkr.web.codec import ParameterCodec, ParameterCodecError
 
 _log = logging.getLogger(__name__)
 
@@ -104,26 +104,13 @@ class ParametersUpdateHandler(TaskRequestHandler):
         :return: validated dict with request data
         """
         try:
-            req = json_decode(data)
-        except ValueError:
-            _log.exception("failed to decode JSON")
-            raise InvalidDataError("JSON decoding error")
+            req = ParameterCodec(as_set=True).decode(data)
+        except ParameterCodecError as perr:
+            raise InvalidDataError(str(perr))
 
-        if not req.items():
-            raise InvalidDataError("No request data")
-
-        for param, val in req.items():
-            _log.debug('validate parameter %s to %s (type: %s)', param,
-                       val, type(val))
-
-            if not isinstance(val, dict):
-                raise InvalidDataError('Incorrect \'value\' field')
-
-            if 'value' not in val:
-                raise InvalidDataError('Missing \'value\' field')
-
+        for param in req:
             try:
-                ParametersStore.validate(param, val['value'])
+                ParametersStore.validate_desc(param)
             except ValueError:
                 _log.exception('failed to validate parameter %s', param)
                 raise InvalidDataError("Incorrect value type of parameter %s" % (param))
@@ -138,17 +125,18 @@ class ParametersUpdateHandler(TaskRequestHandler):
         :return: dict of changed parameters with their values
         """
         # record changed parameters
-        changed_params = {}
+        changed_params = []
 
         # apply parameters serially, note that if any parameter takes
         # longer to aplly this will contribute to wait time of the
         # whole request
-        for param, val in req.items():
+        for param in req:
             servo = self.task.get_servo()
-            value = val['value']
+            value = param.value
+            name = param.name
             try:
                 if servo and servo.is_active():
-                    applied = yield self.apply_param(param, value)
+                    applied = yield self.apply_param(name, value)
                 else:
                     applied = True
             except ParamApplyError:
@@ -156,11 +144,11 @@ class ParametersUpdateHandler(TaskRequestHandler):
 
             # param validation was successful and was applied to servo
             if applied:
-                ParametersStore.set(param, value)
+                ParametersStore.set(name, value)
             else:
                 raise RequestFailedError('Failed to apply parameter %s' % (param))
-            par = ParametersStore.get(param)
-            changed_params[par.name] = par.as_dict()
+            par = ParametersStore.get(name)
+            changed_params.append(par)
 
         raise gen.Return(changed_params)
 
@@ -185,7 +173,7 @@ class ParametersUpdateHandler(TaskRequestHandler):
         try:
             req = self._validate_request(self.request.body)
             changed_params = yield self._apply_parameters(req)
-            self.write(changed_params)
+            self.write(ParameterCodec(as_set=True).encode(changed_params))
 
         except APIError as err:
             self._respond_with_error(err)
