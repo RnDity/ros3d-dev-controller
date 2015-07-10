@@ -29,9 +29,5 @@ setup(
     author='OpenRnD',
     author_email='ros3d@open-rnd.pl',
     license='closed',
-    entry_points = {
-        'console_scripts': [
-            'ros3d-kr = ros3dkr.cmd:main'
-        ]
-    }
+    scripts=['ros3d-kr']
 )
