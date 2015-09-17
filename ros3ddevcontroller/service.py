@@ -17,13 +17,6 @@ import sys
 class Ros3DdevControllerService(VService):
     """Ros3D device controller services wrapper"""
 
-    TASKS = [
-        WebAPITask,
-        ServoTask,
-        ZeroconfTask,
-        MQTTTask
-    ]
-
     config_file = option(default=ConfigLoader.DEFAULT_PATH,
                          help='Ros3D configuration file')
 
@@ -40,3 +33,22 @@ class Ros3DdevControllerService(VService):
                             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         captureWarnings(True)
+
+class Ros3DAOControllerService(Ros3DdevControllerService):
+    """Ros3D ao device controller services wrapper"""
+
+    TASKS = [
+        ZeroconfTask,
+        MQTTTask
+    ]
+
+
+class Ros3DKRControllerService(Ros3DdevControllerService):
+    """Ros3D kr device controller services wrapper"""
+
+    TASKS = [
+        WebAPITask,
+        ServoTask,
+        ZeroconfTask,
+        MQTTTask
+    ]

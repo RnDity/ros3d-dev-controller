@@ -29,5 +29,5 @@ setup(
     author='OpenRnD',
     author_email='ros3d@open-rnd.pl',
     license='closed',
-    scripts=['ros3d-dev-controller']
+    scripts=['ros3d-kr-controller', 'ros3d-ao-controller']
 )
