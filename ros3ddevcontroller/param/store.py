@@ -12,7 +12,7 @@
 
 from __future__ import absolute_import
 
-from ros3dkr.param.parameter import Parameter
+from ros3ddevcontroller.param.parameter import Parameter
 
 import logging
 
@@ -162,6 +162,6 @@ class ParameterLoader(object):
     @classmethod
     def load(cls):
 
-        from ros3dkr.param.sysparams import SYSTEM_PARAMETERS
+        from ros3ddevcontroller.param.sysparams import SYSTEM_PARAMETERS
 
         ParametersStore.load_parameters(SYSTEM_PARAMETERS)

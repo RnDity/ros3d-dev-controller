@@ -3,4 +3,4 @@
 #
 from __future__ import absolute_import
 
-import ros3dkr.service
+import ros3ddevcontroller.service

@@ -2,13 +2,13 @@
 # Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
 #
 
-from ros3dkr.service import Ros3DKRService
-from ros3dkr.param.store import ParameterLoader
+from ros3ddevcontroller.service import Ros3DdevControllerService
+from ros3ddevcontroller.param.store import ParameterLoader
 
 
 def main():
     # load parameters from file
     ParameterLoader.load()
     # initialize tasks
-    Ros3DKRService.initFromCLI()
+    Ros3DdevControllerService.initFromCLI()
 

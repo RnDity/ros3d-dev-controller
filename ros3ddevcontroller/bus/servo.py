@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from sparts.tasks.dbus import DBusTask
 from sparts.sparts import option
 from concurrent.futures import Future
-from ros3dkr.param.store import ParametersStore
+from ros3ddevcontroller.param.store import ParametersStore
 import glib
 import logging
 import dbus

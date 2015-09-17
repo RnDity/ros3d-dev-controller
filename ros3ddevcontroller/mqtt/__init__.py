@@ -3,4 +3,4 @@
 #
 from __future__ import absolute_import
 
-from ros3dkr.mqtt.mqtt import MQTTTask
+from ros3ddevcontroller.mqtt.mqtt import MQTTTask

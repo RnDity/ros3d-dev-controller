@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import unittest
 import mock
 
-from ros3dkr.param.parameter import Parameter, ParameterStatus
+from ros3ddevcontroller.param.parameter import Parameter, ParameterStatus
 
 class ParameterTestCase(unittest.TestCase):
     def test_new_no_status(self):

@@ -3,4 +3,4 @@
 #
 from __future__ import absolute_import
 
-from ros3dkr.param.store import ParametersStore
+from ros3ddevcontroller.param.store import ParametersStore

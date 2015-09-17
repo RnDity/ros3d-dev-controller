@@ -6,8 +6,8 @@
 import unittest
 import mock
 
-from ros3dkr.param.store import ParametersStore, ParameterLoader
-from ros3dkr.param.parameter import Parameter
+from ros3ddevcontroller.param.store import ParametersStore, ParameterLoader
+from ros3ddevcontroller.param.parameter import Parameter
 
 class StoreLoadingTestCase(unittest.TestCase):
     def setUp(self):
@@ -20,7 +20,7 @@ class StoreLoadingTestCase(unittest.TestCase):
 class GetSetStoreTestCase(StoreLoadingTestCase):
 
     def test_get_existing(self):
-        from ros3dkr.param.sysparams import SYSTEM_PARAMETERS
+        from ros3ddevcontroller.param.sysparams import SYSTEM_PARAMETERS
 
         for param in SYSTEM_PARAMETERS:
             name = param.name

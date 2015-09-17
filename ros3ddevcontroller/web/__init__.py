@@ -3,4 +3,4 @@
 #
 from __future__ import absolute_import
 
-from ros3dkr.web.restapi import WebAPITask
+from ros3ddevcontroller.web.restapi import WebAPITask

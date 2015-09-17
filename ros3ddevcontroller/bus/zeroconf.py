@@ -1,14 +1,14 @@
 #
 # Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
 #
-"""Broadcasting KR service using zeroconf"""
+"""Broadcasting device controller service using zeroconf"""
 from __future__ import absolute_import
 
 from sparts.tasks.dbus import DBusTask
 import logging
 import dbus
 import avahi
-from ros3dkr.util import get_eth_mac
+from ros3ddevcontroller.util import get_eth_mac
 
 _log = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ _log = logging.getLogger(__name__)
 class ZeroconfTask(DBusTask):
     """Task for handling of registration with Zeroconf service provider"""
 
-    SERVICE_NAME = 'Ros3D KR API at {mac}'
+    SERVICE_NAME = 'Ros3D dev controller API at {mac}'
     SERVICE_TYPE = "_http._tcp"
     SERVICE_PORT = 0
 
@@ -57,14 +57,14 @@ class ZeroconfTask(DBusTask):
 
         if state == avahi.SERVER_RUNNING:
             self.logger.debug('avahi running')
-            self._register_kr_service()
+            self._register_dev_controller_service()
 
-    def _register_kr_service(self):
+    def _register_dev_controller_service(self):
         # get a new group object
         group_path = self.server.EntryGroupNew()
         # bus object
         group_obj = self.bus.get_object(avahi.DBUS_NAME, group_path)
-        self.logger.debug('KR service object: %s', group_obj)
+        self.logger.debug('dev controller service object: %s', group_obj)
         # group entry proxy
         group = dbus.Interface(group_obj,
                                avahi.DBUS_INTERFACE_ENTRY_GROUP)

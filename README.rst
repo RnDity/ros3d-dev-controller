@@ -1,4 +1,4 @@
 Ros3D Rig Controller
 ====================
 
-Implementation of Ros3D KR component.
+Implementation of Ros3D device controller component.

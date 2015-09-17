@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 import os
 
-NAME='roskr'
+NAME='rosdevcontroller'
 VERSION = '0.1'
 
 install_requires = ['sparts', 'pygobject']
@@ -22,12 +22,12 @@ setup(
     name=NAME,
     version=VERSION,
     packages=find_packages(exclude=['tests', 'tests.*']),
-    description="Ros3D KR",
+    description="Ros3D device controller",
     long_description=read("README.rst"),
     install_requires=install_requires,
     tests_require=tests_require,
     author='OpenRnD',
     author_email='ros3d@open-rnd.pl',
     license='closed',
-    scripts=['ros3d-kr']
+    scripts=['ros3d-dev-controller']
 )

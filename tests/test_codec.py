@@ -7,8 +7,8 @@ import unittest
 import json
 import logging
 
-from ros3dkr.param.parameter import Parameter
-from ros3dkr.web.codec import ParameterCodec, ParameterCodecError
+from ros3ddevcontroller.param.parameter import Parameter
+from ros3ddevcontroller.web.codec import ParameterCodec, ParameterCodecError
 
 _log = logging.getLogger(__name__)
 

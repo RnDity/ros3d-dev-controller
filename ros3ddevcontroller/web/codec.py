@@ -1,13 +1,13 @@
 #
 # Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
 #
-"""Implementation of Ros3D KR REST API"""
+"""Implementation of Ros3D device controller REST API"""
 
 from __future__ import absolute_import
 from tornado.escape import json_encode, json_decode
 import logging
 
-from ros3dkr.param import parameter
+from ros3ddevcontroller.param import parameter
 
 _log = logging.getLogger(__name__)
 

@@ -4,5 +4,5 @@
 #
 
 if __name__ == '__main__':
-    from ros3dkr.cmd import main
+    from ros3ddevcontroller.cmd import main
     main()

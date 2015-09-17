@@ -1,15 +1,15 @@
 #
 # Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
 #
-"""Implementation of Ros3D KR MQTT API"""
+"""Implementation of Ros3D device controller MQTT API"""
 
 from __future__ import absolute_import
 from sparts.tasks.tornado import TornadoTask
 from sparts.sparts import option
 
-from ros3dkr.mqtt.mqttornado import MQTTornadoAdapter
-from ros3dkr.web.codec import ParameterCodec
-from ros3dkr.param  import ParametersStore
+from ros3ddevcontroller.mqtt.mqttornado import MQTTornadoAdapter
+from ros3ddevcontroller.web.codec import ParameterCodec
+from ros3ddevcontroller.param  import ParametersStore
 
 import paho.mqtt.client as mqtt
 import logging

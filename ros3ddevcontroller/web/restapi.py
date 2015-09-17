@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
 #
-"""Implementation of Ros3D KR REST API"""
+"""Implementation of Ros3D device controller REST API"""
 
 from __future__ import absolute_import
 
@@ -10,9 +10,9 @@ import tornado.web
 from tornado.escape import json_decode
 from sparts.tasks.tornado import TornadoHTTPTask
 from tornado import gen
-from ros3dkr.param  import ParametersStore
-from ros3dkr.bus.servo import ServoTask, ParamApplyError
-from ros3dkr.web.codec import ParameterCodec, ParameterCodecError
+from ros3ddevcontroller.param  import ParametersStore
+from ros3ddevcontroller.bus.servo import ServoTask, ParamApplyError
+from ros3ddevcontroller.web.codec import ParameterCodec, ParameterCodecError
 
 _log = logging.getLogger(__name__)
 

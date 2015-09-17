@@ -4,18 +4,18 @@
 from sparts.vservice import VService
 from sparts.sparts import option
 from sparts.compat import captureWarnings
-from ros3dkr.web import WebAPITask
-from ros3dkr.bus import Ros3DDBusTask
-from ros3dkr.bus.servo import ServoTask
-from ros3dkr.bus.zeroconf import ZeroconfTask
-from ros3dkr.util import ConfigLoader
-from ros3dkr.mqtt import MQTTTask
+from ros3ddevcontroller.web import WebAPITask
+from ros3ddevcontroller.bus import Ros3DDBusTask
+from ros3ddevcontroller.bus.servo import ServoTask
+from ros3ddevcontroller.bus.zeroconf import ZeroconfTask
+from ros3ddevcontroller.util import ConfigLoader
+from ros3ddevcontroller.mqtt import MQTTTask
 import logging
 import sys
 
 
-class Ros3DKRService(VService):
-    """Ros3D KR services wrapper"""
+class Ros3DdevControllerService(VService):
+    """Ros3D device controller services wrapper"""
 
     TASKS = [
         WebAPITask,
@@ -28,7 +28,7 @@ class Ros3DKRService(VService):
                          help='Ros3D configuration file')
 
     def __init__(self, *args, **kwargs):
-        super(Ros3DKRService, self).__init__(*args, **kwargs)
+        super(Ros3DdevControllerService, self).__init__(*args, **kwargs)
 
         self.logger.debug('loading configuration from %s',
                           self.options.config_file)
