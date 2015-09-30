@@ -38,6 +38,7 @@ class Ros3DAOControllerService(Ros3DdevControllerService):
     """Ros3D ao device controller services wrapper"""
 
     TASKS = [
+        WebAPITask,
         ZeroconfTask,
         MQTTTask
     ]
