@@ -28,7 +28,11 @@ class ZeroconfTask(DBusTask):
 
         self.logger.debug('device MAC address: %s', eth_mac)
 
-        self.service_name = ZeroconfTask.SERVICE_NAME.format(mac=eth_mac)
+        self.service_name = getattr(self.service, 'ZEROCONF_SERVICE_NAME', None)
+        if not self.service_name:
+            self.service_name = ZeroconfTask.SERVICE_NAME.format(mac=eth_mac)
+        self.logger.debug('service name: %s', self.service_name)
+
         self.server = None
         self.group = None
         self.bus = None
