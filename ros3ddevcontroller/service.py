@@ -8,7 +8,7 @@ from ros3ddevcontroller.web import WebAPITask
 from ros3ddevcontroller.bus import Ros3DDBusTask
 from ros3ddevcontroller.bus.servo import ServoTask
 from ros3ddevcontroller.bus.zeroconf import ZeroconfTask
-from ros3ddevcontroller.util import ConfigLoader
+from ros3ddevcontroller.util import ConfigLoader, get_eth_mac
 from ros3ddevcontroller.mqtt import MQTTTask
 import logging
 import sys
@@ -37,6 +37,7 @@ class Ros3DdevControllerService(VService):
 class Ros3DAOControllerService(Ros3DdevControllerService):
     """Ros3D ao device controller services wrapper"""
 
+    ZEROCONF_SERVICE_NAME = 'Ros3D AO dev controller API at {mac}'.format(mac=get_eth_mac())
     TASKS = [
         WebAPITask,
         ZeroconfTask,
@@ -47,6 +48,7 @@ class Ros3DAOControllerService(Ros3DdevControllerService):
 class Ros3DKRControllerService(Ros3DdevControllerService):
     """Ros3D kr device controller services wrapper"""
 
+    ZEROCONF_SERVICE_NAME = 'Ros3D KR dev controller API at {mac}'.format(mac=get_eth_mac())
     TASKS = [
         WebAPITask,
         ServoTask,
