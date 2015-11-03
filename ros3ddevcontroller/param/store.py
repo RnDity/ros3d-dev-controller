@@ -13,6 +13,7 @@
 from __future__ import absolute_import
 
 from ros3ddevcontroller.param.parameter import Parameter
+from ros3ddevcontroller.web.codec import ParameterCodec
 
 import logging
 
@@ -71,7 +72,7 @@ class ParametersStore(object):
     def parameters_as_dict(cls):
         params = {}
         for pname, pp in cls.PARAMETERS.items():
-            params[pname] = pp.as_dict()
+            params[pname] = ParameterCodec.parameter_to_dict(pp)
         return params
 
     @classmethod
