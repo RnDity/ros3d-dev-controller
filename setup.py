@@ -38,5 +38,6 @@ setup(
     scripts=[
         'ros3d-kr-controller',
         'ros3d-ao-controller',
+        'ros3d-controllerctl',
     ]
 )

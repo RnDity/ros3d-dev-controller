@@ -1,0 +1,114 @@
+#!/usr/bin/env python2
+#
+# Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
+#
+
+from __future__ import absolute_import, print_function
+import argparse
+import logging
+import requests
+import json
+from urlparse import urljoin
+from pprint import pprint
+
+
+def parse_arguments():
+    default_host = 'localhost'
+    default_port = 8090
+
+    parser = argparse.ArgumentParser(description='Ros3D Controller Tool')
+    parser.add_argument('--host',
+                        help='Host address, default: {}'.format(default_host),
+                        default=default_host)
+    parser.add_argument('--port',
+                        help='Port, default: {}'.format(default_port),
+                        default=default_port, type=int)
+    parser.add_argument('-l', '--list', action='store_true',
+                        help='List parameters',
+                        default=False)
+    parser.add_argument('-s', '--set',
+                        help='Set parameters, format: <param>:<type>:<value>, ex: focus_distance_m:float:20; parameter types: float, int, str',
+                        nargs='+',
+                        default=[])
+    return parser.parse_args()
+
+
+def print_response(resp):
+    """Helper for pretty printing of a response"""
+    if resp.status_code == 200:
+        pprint(resp.json())
+    else:
+        logging.error('request failed with code: %d', resp.status_code)
+        logging.error('response text:\n\t%s', resp.text)
+
+
+def list_params(url):
+    durl = urljoin(url, '/api/parameters/list')
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.get(durl))
+
+
+def as_ptype(ptype, val):
+    if ptype == 'float':
+        return float(val)
+    elif ptype == 'str':
+        return str(val)
+    elif ptype == 'int':
+        return int(val)
+    raise ValueError('unknown parameter type %s' % (ptype))
+
+
+def decode_parameters_data(params):
+    """Helper for converting a list of parameters in format
+    <param>:<type>:<value> to a dict suitable for using as data for
+    /parameters/update API call
+
+    """
+    data = {}
+    for par in params:
+        try:
+            name, ptype, val = par.split(':')
+            data[name] = {'value': as_ptype(ptype, val)}
+        except ValueError:
+            logging.exception('failed to parse parameter %s', par)
+            raise
+
+    logging.debug('decoded params: %s', data)
+    return data
+
+
+def set_params(url, params):
+    logging.debug('set parameters: %s', params)
+
+    data = decode_parameters_data(params)
+
+    durl = urljoin(url, '/api/parameters/update')
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.put(durl, json=data))
+
+
+def main(opts):
+    logging.info('connecting to: %s:%d', opts.host, opts.port)
+
+    opts.url = 'http://{:s}:{:d}'.format(opts.host, opts.port)
+
+    if opts.list:
+        # list parameters
+        list_params(opts.url)
+    elif opts.set:
+        set_params(opts.url, opts.set)
+
+
+if __name__ == '__main__':
+
+    opts = parse_arguments()
+
+    logging.basicConfig(level=logging.DEBUG)
+
+    if not opts.set and not opts.list:
+        # default to list
+        opts.list = True
+
+    main(opts)
