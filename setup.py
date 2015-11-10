@@ -7,7 +7,10 @@ import os
 NAME='rosdevcontroller'
 VERSION = '0.1'
 
-install_requires = ['sparts', 'pygobject']
+install_requires = [
+    'sparts',
+    'pygobject',
+]
 tests_require = []
 
 ROOT = os.path.dirname(__file__)
@@ -29,5 +32,8 @@ setup(
     author='OpenRnD',
     author_email='ros3d@open-rnd.pl',
     license='closed',
-    scripts=['ros3d-kr-controller', 'ros3d-ao-controller']
+    scripts=[
+        'ros3d-kr-controller',
+        'ros3d-ao-controller',
+    ]
 )
