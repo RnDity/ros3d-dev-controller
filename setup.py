@@ -12,6 +12,7 @@ install_requires = [
     'pygobject',
     'tornado',
     'paho-mqtt',
+    'requests',
 ]
 tests_require = []
 
