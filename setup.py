@@ -10,6 +10,7 @@ VERSION = '0.1'
 install_requires = [
     'sparts',
     'pygobject',
+    'tornado',
 ]
 tests_require = []
 
