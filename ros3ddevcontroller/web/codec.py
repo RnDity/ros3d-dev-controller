@@ -38,9 +38,9 @@ class ParameterCodec(object):
             "status": ParameterCodec.status_as_dict(param.status),
         }
 
-        if param.min_value:
+        if param.min_value is not None:
             ad["minValue"] = param.min_value
-        if param.max_value:
+        if param.max_value is not None:
             ad["maxValue"] = param.max_value
 
         return ad
