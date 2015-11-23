@@ -43,6 +43,7 @@ class ServoTask(DBusTask):
     SERVO_DBUS_SERVICE = 'pl.ros3d.servo'
     SERVO_DBUS_PATH = '/pl/ros3d/servo'
     SERVO_DBUS_INTERFACE = "pl.ros3d.servo"
+    SERVO_CALL_TIMEOUT_S = 120 # seconds
 
     session_bus = option(action='store_true', type=bool,
                          default=False,
@@ -160,7 +161,8 @@ class ServoTask(DBusTask):
 
         try:
             res = self.servo.setValue(request.param,
-                                      request.value)
+                                      request.value,
+                                      timeout=ServoTask.SERVO_CALL_TIMEOUT_S)
             _log.debug('parameter \'%s\' -> %s set request done, result: %s ',
                        request.param, request.value, res)
             # setValue has signature 'by'
