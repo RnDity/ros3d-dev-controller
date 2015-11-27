@@ -42,7 +42,7 @@ class Parameter(object):
 
         if not status:
             self.status = ParameterStatus(read=True, write=True,
-                                          status_type=ParameterStatus.HARDWARE)
+                                          status_type=ParameterStatus.SOFTWARE)
         else:
             assert isinstance(status, ParameterStatus)
             self.status = status
