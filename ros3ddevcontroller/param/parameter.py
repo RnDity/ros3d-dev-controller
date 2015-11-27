@@ -62,3 +62,153 @@ class Evaluator(object):
 
     def __call__(self):
         raise NotImplementedError('Evaluation for {} not implemented'.format(self.__name__))
+
+
+class DofNearCalc(Evaluator):
+    pass
+
+
+class DofFarCalc(Evaluator):
+    pass
+
+
+class FovHorizontalDegCalc(Evaluator):
+    pass
+
+
+class FovVerticalDegCalc(Evaluator):
+    pass
+
+
+class FovDiagonalDegCalc(Evaluator):
+    pass
+
+
+class ConvergenceDegCalc(Evaluator):
+    pass
+
+
+class ConvergencePxCalc(Evaluator):
+    pass
+
+
+class ParallaxNearPercentCalc(Evaluator):
+    pass
+
+
+class ParallaxScreenPercentCalc(Evaluator):
+    pass
+
+
+class ParallaxFarPercentCalc(Evaluator):
+    pass
+
+
+class ParallaxObjectPercentCalc(Evaluator):
+    pass
+
+
+class ParallaxObject2PercentCalc(Evaluator):
+    pass
+
+
+class ParallaxNearMMCalc(Evaluator):
+    pass
+
+
+class ParallaxScreenMMCalc(Evaluator):
+    pass
+
+
+class ParallaxFarMMCalc(Evaluator):
+    pass
+
+
+class ParallaxObjectMMCalc(Evaluator):
+    pass
+
+
+class ParallaxObject2MMCalc(Evaluator):
+    pass
+
+
+class RealWidthNearCalc(Evaluator):
+    pass
+
+
+class RealHeightNearCalc(Evaluator):
+    pass
+
+
+class RealWidthScreenCalc(Evaluator):
+    pass
+
+
+class RealHeightScreenCalc(Evaluator):
+    pass
+
+
+class RealHeightFarCalc(Evaluator):
+    pass
+
+
+class RealHeightFarCalc(Evaluator):
+    pass
+
+
+class RealHeightObjectCalc(Evaluator):
+    pass
+
+
+class RealHeightObjectCalc(Evaluator):
+    pass
+
+
+class RealHeightObject2Calc(Evaluator):
+    pass
+
+
+class RealHeightObject2Calc(Evaluator):
+    pass
+
+
+class FrameWidthMMCalc(Evaluator):
+    pass
+
+
+class FrameDiagonalMMCalc(Evaluator):
+    pass
+
+
+class FrameHorizontalCropCalc(Evaluator):
+    pass
+
+
+class FrameVerticalCropCalc(Evaluator):
+    pass
+
+
+class FrameDiagonalCropCalc(Evaluator):
+    pass
+
+
+class CocUmCalc(Evaluator):
+    pass
+
+
+class ScreenDistanceCalc(Evaluator):
+    pass
+
+
+class SpectatorFovHorizontalDegCalc(Evaluator):
+    pass
+
+
+class PerceivedMaxPopoutPercCalc(Evaluator):
+    pass
+
+
+class PerceivedMaxPopoutMCalc(Evaluator):
+    pass
+
+
