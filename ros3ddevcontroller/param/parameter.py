@@ -57,6 +57,15 @@ class Parameter(object):
         self.evaluator = evaluator
 
 
+class ReadOnlyParameter(Parameter):
+    """Read only parameter wrapper"""
+
+    def __init__(self, name, value, value_type, **kwargs):
+        super(ReadOnlyParameter, self).__init__(name, value, value_type,
+                                                status=ParameterStatus(write=False),
+                                                **kwargs)
+
+
 class Evaluator(object):
     NAME = 'unset'
 
