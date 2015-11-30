@@ -16,7 +16,7 @@ class ParameterStatus(object):
     SOFTWARE = 'software'
 
     def __init__(self, read=True, write=True,
-                 status_type=HARDWARE):
+                 status_type=SOFTWARE):
         self.read = read
         self.write = write
         self.status = status_type
