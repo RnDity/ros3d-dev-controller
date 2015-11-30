@@ -81,6 +81,10 @@ class DofFarCalc(Evaluator):
     pass
 
 
+class DofTotalCalc(Evaluator):
+    pass
+
+
 class FovHorizontalDegCalc(Evaluator):
     pass
 
@@ -113,7 +117,7 @@ class ParallaxFarPercentCalc(Evaluator):
     pass
 
 
-class ParallaxObjectPercentCalc(Evaluator):
+class ParallaxObject1PercentCalc(Evaluator):
     pass
 
 
@@ -133,7 +137,7 @@ class ParallaxFarMMCalc(Evaluator):
     pass
 
 
-class ParallaxObjectMMCalc(Evaluator):
+class ParallaxObject1MMCalc(Evaluator):
     pass
 
 
@@ -165,15 +169,15 @@ class RealHeightFarCalc(Evaluator):
     pass
 
 
-class RealHeightObjectCalc(Evaluator):
+class RealHeightObject1Calc(Evaluator):
     pass
 
 
-class RealHeightObjectCalc(Evaluator):
+class RealWidthObject1Calc(Evaluator):
     pass
 
 
-class RealHeightObject2Calc(Evaluator):
+class RealWidthObject2Calc(Evaluator):
     pass
 
 
@@ -213,11 +217,43 @@ class SpectatorFovHorizontalDegCalc(Evaluator):
     pass
 
 
-class PerceivedMaxPopoutPercCalc(Evaluator):
+class PerceivedPositionNearPercCalc(Evaluator):
     pass
 
 
-class PerceivedMaxPopoutMCalc(Evaluator):
+class PerceivedPositionScreenPercCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionFarPercCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionObject1PercCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionObject2PercCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionNearMCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionScreenMCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionFarMCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionObject1MCalc(Evaluator):
+    pass
+
+
+class PerceivedPositionObject2MCalc(Evaluator):
     pass
 
 
