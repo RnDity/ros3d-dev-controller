@@ -179,6 +179,26 @@ class ParametersUpdateHandler(TaskRequestHandler):
             self._respond_with_error(err)
 
 
+class SnapshotsCaptureHandler(TaskRequestHandler):
+    def post(self):
+        _log.debug("SnapshotsCaptureHandler() Request: %s", self.request)
+
+        try:
+            pass
+        except APIError as err:
+            self._respond_with_error(err)
+
+
+class SnapshotsListHandler(TaskRequestHandler):
+    def get(self):
+        _log.debug("SnapshotsListHandler() Request: %s", self.request)
+
+        try:
+            pass
+        except APIError as err:
+            self._respond_with_error(err)
+
+
 class ServosCalibrateHandler(TaskRequestHandler):
     def get(self):
         _log.debug("ServosCalibrateHandler()")
@@ -200,6 +220,8 @@ class WebAPITask(TornadoHTTPTask):
             (r"/api/system/status", SystemStatusHandler, dict(task=self)),
             (r"/api/parameters/list", ParametersListHandler, dict(task=self)),
             (r"/api/parameters/update", ParametersUpdateHandler, dict(task=self)),
+            (r"/api/snapshots/list", SnapshotsListHandler, dict(task=self)),
+            (r"/api/snapshots/capture", SnapshotsCaptureHandler, dict(task=self)),
             (r"/api/servo/calibrate", ServosCalibrateHandler, dict(task=self)),
             (r"/api/servo/connected", ServosConnectedHandler, dict(task=self)),
         ]
