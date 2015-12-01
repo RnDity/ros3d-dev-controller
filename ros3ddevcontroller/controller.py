@@ -1,4 +1,5 @@
 """Core Ros3D controller logic"""
+from __future__ import absolute_import
 import logging
 from ros3ddevcontroller.param import ParametersStore
 
