@@ -11,14 +11,14 @@ import os
 class ConfigLoader(object):
     """Ros3D system configuration loader"""
 
-    DEFAULT_PATH = '/etc/ros3d.conf'
+    DEFAULT_PATH = '/etc/ros3d-controller/controller.conf'
     CONFIG_PATH = DEFAULT_PATH
 
     logger = logging.getLogger(__name__)
 
     def __init__(self, path=None):
         self.config = None
-        self._load_config(path if path else ConfigLoader.CONFIG_PATH)
+        self._load_config(path if path else self.CONFIG_PATH)
 
     def _load_config(self, path):
         """Load configuration from file given by `path`"""
@@ -39,16 +39,6 @@ class ConfigLoader(object):
                                   section, name, default)
             return default
 
-    def get_system(self):
-        """Get assigned system"""
-        sys_name = self._get('common', 'system', '')
-        return sys_name
-
-    def set_system(self, value):
-        if not self.config.has_section('common'):
-            self.config.add_section('common')
-        self.config.set('common', 'system', value)
-
     def write(self):
         import tempfile
         import shutil
@@ -58,13 +48,30 @@ class ConfigLoader(object):
         with os.fdopen(fd, 'w') as outf:
             self.config.write(outf)
 
-        self.logger.debug('replacing %s', ConfigLoader.CONFIG_PATH)
-        shutil.move(path, ConfigLoader.CONFIG_PATH)
+        self.logger.debug('replacing %s', self.CONFIG_PATH)
+        shutil.move(path, self.CONFIG_PATH)
 
     @classmethod
     def set_config_location(cls, path):
         cls.logger.debug('setting config path to %s', path)
         cls.CONFIG_PATH = path
+
+
+class SystemConfigLoader(ConfigLoader):
+    """Ros3D system configuration loader"""
+
+    DEFAULT_PATH = '/etc/ros3d.conf'
+    CONFIG_PATH = DEFAULT_PATH
+
+    def get_system(self):
+        """Get assigned system"""
+        sys_name = self._get('common', 'system', '')
+        return sys_name
+
+    def set_system(self, value):
+        if not self.config.has_section('common'):
+            self.config.add_section('common')
+        self.config.set('common', 'system', value)
 
 
 def get_eth_mac():
