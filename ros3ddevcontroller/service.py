@@ -8,7 +8,7 @@ from ros3ddevcontroller.web import WebAPITask
 from ros3ddevcontroller.bus import Ros3DDBusTask
 from ros3ddevcontroller.bus.servo import ServoTask
 from ros3ddevcontroller.bus.zeroconf import ZeroconfTask
-from ros3ddevcontroller.util import SystemConfigLoader, ConfigLoader, get_eth_mac
+from ros3ddevcontroller.util import SystemConfigLoader, ControllerConfigLoader, get_eth_mac
 from ros3ddevcontroller.mqtt import MQTTTask
 import logging
 import sys
@@ -19,7 +19,7 @@ class Ros3DdevControllerService(VService):
 
     system_config_file = option(default=SystemConfigLoader.DEFAULT_PATH,
                                 help='Ros3D system configuration file')
-    config_file = option(default=ConfigLoader.DEFAULT_PATH,
+    config_file = option(default=ControllerConfigLoader.DEFAULT_PATH,
                          help='Ros3D controller configuration file')
 
     def __init__(self, *args, **kwargs):
@@ -27,7 +27,7 @@ class Ros3DdevControllerService(VService):
 
         self.logger.debug('loading controller configuration from %s',
                           self.options.config_file)
-        self.config = ConfigLoader(self.options.config_file)
+        self.config = ControllerConfigLoader(self.options.config_file)
         self.logger.debug('loading system configuration from %s',
                           self.options.system_config_file)
         self.system_config = SystemConfigLoader(self.options.system_config_file)
