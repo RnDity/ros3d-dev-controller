@@ -10,6 +10,7 @@ from ros3ddevcontroller.bus.servo import ServoTask
 from ros3ddevcontroller.bus.zeroconf import ZeroconfTask
 from ros3ddevcontroller.util import SystemConfigLoader, ControllerConfigLoader, get_eth_mac
 from ros3ddevcontroller.mqtt import MQTTTask
+from ros3ddevcontroller.controller import Controller
 import logging
 import sys
 
@@ -31,6 +32,9 @@ class Ros3DdevControllerService(VService):
         self.logger.debug('loading system configuration from %s',
                           self.options.system_config_file)
         self.system_config = SystemConfigLoader(self.options.system_config_file)
+
+        self.controller = Controller()
+        self.controller.set_snapshots_location(self.config.get_snapshots_location())
 
     def initLogging(self):
         """Setup logging to stderr"""
