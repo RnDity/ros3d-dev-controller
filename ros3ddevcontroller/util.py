@@ -131,3 +131,19 @@ def get_eth_mac():
         address = '00:00:00:00:00:00'
 
     return address
+
+
+def make_dir(path):
+    """Create complete directory path. Return True on success. If
+    directory exists, True is returned
+
+    :param path str: directory path
+    :rtype bool:
+    """
+    try:
+        if not os.path.exists(path):
+            os.makedirs(path)
+    except OSError:
+        return False
+    else:
+        return True
