@@ -9,7 +9,7 @@ import os.path
 import os
 
 class ConfigLoader(object):
-    """Ros3D system configuration loader"""
+    """Ros3D configuration loader"""
 
     DEFAULT_PATH = '/etc/ros3d-controller/controller.conf'
     CONFIG_PATH = DEFAULT_PATH
@@ -55,6 +55,15 @@ class ConfigLoader(object):
     def set_config_location(cls, path):
         cls.logger.debug('setting config path to %s', path)
         cls.CONFIG_PATH = path
+
+
+class ControllerConfigLoader(ConfigLoader):
+    DEFAULT_SNAPSHOTS_LOCATION = '/var/lib/ros3d-controller/snapshots'
+
+    """Ros3D controller configuration loader"""
+    def get_snapshots_location(self):
+        return self._get('controller', 'snapshots_location',
+                         self.DEFAULT_SNAPSHOTS_LOCATION)
 
 
 class SystemConfigLoader(ConfigLoader):
