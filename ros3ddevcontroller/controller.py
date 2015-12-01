@@ -1,7 +1,8 @@
 """Core Ros3D controller logic"""
 from __future__ import absolute_import
 import logging
-from ros3ddevcontroller.param import ParametersStore
+from ros3ddevcontroller.param.store import ParametersStore, ParameterSnapshotter, ParameterLoader
+from ros3ddevcontroller.param.backends import FileSnapshotBackend
 from ros3ddevcontroller.util import make_dir
 
 
@@ -10,6 +11,7 @@ class Controller(object):
         self.logger = logging.getLogger(__name__)
         self.servo = None
         self.snapshots_location = None
+        self.snapshots_backend = None
 
     def set_servo(self, servo):
         """Servo interface"""
@@ -20,6 +22,9 @@ class Controller(object):
         self.snapshots_location = loc
         make_dir(self.snapshots_location)
 
+        # update snapshots backend
+        self.snapshots_backend = FileSnapshotBackend(self.snapshots_location)
+
     def apply_param(self, param):
         """Apply parameter"""
         raise NotImplementedError('not implemented')
@@ -29,8 +34,28 @@ class Controller(object):
         return ParametersStore.parameters_as_dict()
 
     def take_snapshot(self):
-        raise NotImplementedError('not implemented')
+        ParameterSnapshotter.save(self.snapshots_backend)
 
     def list_snapshots(self):
-        raise NotImplementedError('not implemented')
+        """List IDs of available snapshots
 
+        :rtype list(int):
+        :return: list of snapshot IDs
+        """
+        snapshots = self.snapshots_backend.list_snapshots()
+        self.logger.debug('snapshots: %s', snapshots)
+        return snapshots
+
+    def get_snapshot(self, snapshot_id):
+        """Obtain data of snapshot `snapshot_id`. Returns a dictionary with
+        parameters stored in the snapshot
+
+        :param snapshot_id int: ID of snapshot
+        :rtype dict:
+
+        """
+        self.logger.debug('load snapshot %d', snapshot_id)
+        sdata = self.snapshots_backend.load(snapshot_id)
+        if not sdata:
+            self.logger.error('failed to load snapshot data for ID %d', snapshot_id)
+        return sdata
