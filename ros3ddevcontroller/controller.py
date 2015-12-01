@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 import logging
 from ros3ddevcontroller.param import ParametersStore
+from ros3ddevcontroller.util import make_dir
 
 
 class Controller(object):
@@ -17,6 +18,7 @@ class Controller(object):
     def set_snapshots_location(self, loc):
         """Set location of snapshots"""
         self.snapshots_location = loc
+        make_dir(self.snapshots_location)
 
     def apply_param(self, param):
         """Apply parameter"""
