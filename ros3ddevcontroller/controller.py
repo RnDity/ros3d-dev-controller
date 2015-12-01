@@ -1,6 +1,7 @@
 """Core Ros3D controller logic"""
 from __future__ import absolute_import
 import logging
+import datetime
 from ros3ddevcontroller.param.store import ParametersStore, ParameterSnapshotter, ParameterLoader
 from ros3ddevcontroller.param.backends import FileSnapshotBackend
 from ros3ddevcontroller.util import make_dir
@@ -33,7 +34,16 @@ class Controller(object):
         """Return a dict with all parameters in the system"""
         return ParametersStore.parameters_as_dict()
 
+    def _record_timestamp(self):
+        """Helper for updating current timestamp in parameters"""
+        now = datetime.datetime.now()
+        ParametersStore.set('record_date', str(now),
+                            notify=False)
+
     def take_snapshot(self):
+        # record timestamp
+        self._record_timestamp()
+
         ParameterSnapshotter.save(self.snapshots_backend)
 
     def list_snapshots(self):
