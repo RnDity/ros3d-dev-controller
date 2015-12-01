@@ -8,7 +8,7 @@ from ros3ddevcontroller.web import WebAPITask
 from ros3ddevcontroller.bus import Ros3DDBusTask
 from ros3ddevcontroller.bus.servo import ServoTask
 from ros3ddevcontroller.bus.zeroconf import ZeroconfTask
-from ros3ddevcontroller.util import ConfigLoader, get_eth_mac
+from ros3ddevcontroller.util import SystemConfigLoader, ConfigLoader, get_eth_mac
 from ros3ddevcontroller.mqtt import MQTTTask
 import logging
 import sys
@@ -17,15 +17,20 @@ import sys
 class Ros3DdevControllerService(VService):
     """Ros3D device controller services wrapper"""
 
+    system_config_file = option(default=SystemConfigLoader.DEFAULT_PATH,
+                                help='Ros3D system configuration file')
     config_file = option(default=ConfigLoader.DEFAULT_PATH,
-                         help='Ros3D configuration file')
+                         help='Ros3D controller configuration file')
 
     def __init__(self, *args, **kwargs):
         super(Ros3DdevControllerService, self).__init__(*args, **kwargs)
 
-        self.logger.debug('loading configuration from %s',
+        self.logger.debug('loading controller configuration from %s',
                           self.options.config_file)
         self.config = ConfigLoader(self.options.config_file)
+        self.logger.debug('loading system configuration from %s',
+                          self.options.system_config_file)
+        self.system_config = SystemConfigLoader(self.options.system_config_file)
 
     def initLogging(self):
         """Setup logging to stderr"""
@@ -33,6 +38,7 @@ class Ros3DdevControllerService(VService):
                             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         captureWarnings(True)
+
 
 class Ros3DAOControllerService(Ros3DdevControllerService):
     """Ros3D ao device controller services wrapper"""
