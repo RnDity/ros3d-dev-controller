@@ -232,10 +232,15 @@ class WebAPITask(TornadoHTTPTask):
 
         _log.debug("API task starting")
 
-        self.servo_task = self.service.getTask(ServoTask)
+        self.servo_task = self.service.controller.servo
         _log.debug('servo task: %s', self.servo_task)
 
     def get_servo(self):
         """Access servo task"""
         return self.servo_task
+
+    @property
+    def controller(self):
+        """Access controller instance"""
+        return self.service.controller
 
