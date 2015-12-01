@@ -130,11 +130,12 @@ class ParametersStore(object):
         cls._convert(pdesc, desc.value)
 
     @classmethod
-    def set(cls, name, value):
+    def set(cls, name, value, notify=True):
         """Set a parameter, attempts automatic conversion to proper type
 
         :param name str: parameter name
         :param value: parameter value
+        :param notify bool: trigger parameter change notification chain
         :rtype: bool, True if successful
         :return: True if successful
         """
@@ -142,7 +143,9 @@ class ParametersStore(object):
 
         pdesc = cls._find_param(name)
         pdesc.value = cls._convert(pdesc, value)
-        cls.change_listeners.fire(pdesc)
+        if notify:
+            cls.change_listeners.fire(pdesc)
+
         return True
 
     @classmethod
