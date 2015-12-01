@@ -186,3 +186,24 @@ class ParameterLoader(object):
         from ros3ddevcontroller.param.sysparams import SYSTEM_PARAMETERS
 
         ParametersStore.load_parameters(SYSTEM_PARAMETERS)
+
+
+class ParameterSnapshotBackend(object):
+    """Backend for storing parameter snapshots. A user defined class is
+    expected to inherit this one and implement save() method
+
+    """
+
+    def save(self, parameters):
+        """Save parameters snapshot
+
+        :param parameters list: list of Parameter entries"""
+        raise NotImplementedError('{:s} needs implementation'.format(__name__))
+
+    def load(self, snapshot_id):
+        """Retrieve snapshot data
+
+        :param snapshot_id int: ID of snapshot
+        :rtype list:
+        :return: list of Parameter entries"""
+        raise NotImplementedError('{:s} needs implementation'.format(__name__))
