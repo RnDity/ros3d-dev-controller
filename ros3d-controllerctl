@@ -8,6 +8,7 @@ import argparse
 import logging
 import requests
 import json
+import sys
 from urlparse import urljoin
 from pprint import pprint
 
@@ -107,7 +108,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.DEBUG)
 
-    if not opts.set and not opts.list:
+    if len(sys.argv) == 1:
         # default to list
         opts.list = True
 
