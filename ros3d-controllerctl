@@ -31,6 +31,12 @@ def parse_arguments():
                         help='Set parameters, format: <param>:<type>:<value>, ex: focus_distance_m:float:20; parameter types: float, int, str',
                         nargs='+',
                         default=[])
+    parser.add_argument('--save-snapshot', help='Save a snapshot of paramters',
+                        default=False, action='store_true')
+    parser.add_argument('--list-snapshots', help='List available snapshots',
+                        default=False, action='store_true')
+    parser.add_argument('--download-snapshot', help='Download snapshot',
+                        default=False, action='store_true')
     return parser.parse_args()
 
 
@@ -90,6 +96,24 @@ def set_params(url, params):
     print_response(requests.put(durl, json=data))
 
 
+def save_snapshot(url):
+    logging.debug('save snapshot')
+
+    durl = urljoin(url, '/api/snapshots/capture')
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.post(durl))
+
+
+def list_snapshots(url):
+    logging.debug('save snapshot')
+
+    durl = urljoin(url, '/api/snapshots/list')
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.get(durl))
+
+
 def main(opts):
     logging.info('connecting to: %s:%d', opts.host, opts.port)
 
@@ -100,6 +124,10 @@ def main(opts):
         list_params(opts.url)
     elif opts.set_parameter:
         set_params(opts.url, opts.set_parameter)
+    elif opts.save_snapshot:
+        save_snapshot(opts.url)
+    elif opts.list_snapshots:
+        list_snapshots(opts.url)
 
 
 if __name__ == '__main__':
