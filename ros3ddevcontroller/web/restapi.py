@@ -7,12 +7,13 @@ from __future__ import absolute_import
 
 import logging
 import tornado.web
-from tornado.escape import json_decode
+from tornado.escape import json_decode, json_encode
 from sparts.tasks.tornado import TornadoHTTPTask
 from tornado import gen
 from ros3ddevcontroller.param  import ParametersStore
 from ros3ddevcontroller.bus.servo import ServoTask, ParamApplyError
 from ros3ddevcontroller.web.codec import ParameterCodec, ParameterCodecError
+
 
 _log = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ class SystemStatusHandler(TaskRequestHandler):
 
 class ParametersListHandler(TaskRequestHandler):
     def get(self):
-        params = ParametersStore.parameters_as_dict()
+        params = self.task.controller.get_params()
 
         _log.debug("ParametersListHandler() Response: %s" % params)
         self.write(params)
@@ -184,7 +185,7 @@ class SnapshotsCaptureHandler(TaskRequestHandler):
         _log.debug("SnapshotsCaptureHandler() Request: %s", self.request)
 
         try:
-            pass
+            self.task.controller.take_snapshot()
         except APIError as err:
             self._respond_with_error(err)
 
@@ -194,13 +195,22 @@ class SnapshotsListHandler(TaskRequestHandler):
         _log.debug("SnapshotsListHandler() Request: %s", self.request)
 
         try:
-            pass
+            snapshots = self.task.controller.list_snapshots()
+            self.write(json_encode(snapshots))
+        except APIError as err:
+            self._respond_with_error(err)
+
+
 class SnapshotGetHandler(TaskRequestHandler):
     def get(self, snapshot_id):
         _log.debug("SnapshotsGetHandler() Request: %s", self.request)
 
         try:
-            pass
+            sid = int(snapshot_id)
+            _log.debug("get snapshot: %d", sid)
+
+            snapshot = self.task.controller.get_snapshot(sid)
+            self.write(ParameterCodec(as_set=True).encode(snapshot))
         except APIError as err:
             self._respond_with_error(err)
 
