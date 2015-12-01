@@ -77,8 +77,9 @@ class ZeroconfTask(DBusTask):
                                 self._group_state_changed)
 
         description = []
-        description.append("system=" + self.service.config.get_system())
+        description.append("system=" + self.service.system_config.get_system())
 
+        self.logger.warning('system description: %s', description)
         group.AddService(avahi.IF_UNSPEC,  # any interface
                          avahi.PROTO_INET, # IPv4
                          dbus.UInt32(0),   # flags
