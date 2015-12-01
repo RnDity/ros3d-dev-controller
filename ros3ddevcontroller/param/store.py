@@ -207,3 +207,20 @@ class ParameterSnapshotBackend(object):
         :rtype list:
         :return: list of Parameter entries"""
         raise NotImplementedError('{:s} needs implementation'.format(__name__))
+
+
+class ParameterSnapshotter(object):
+    """Utility class for saving a snapshot of all parameters to specified
+    location"""
+
+    @classmethod
+    def save(cls, backend=None):
+        """Save parameter using backend `backend`
+
+        :param backend ParameterSnapshotBackend: a ParameterSnapshotBackend instance"""
+        assert backend != None
+
+        from ros3ddevcontroller.param.sysparams import SYSTEM_PARAMETERS
+
+        backend.save(SYSTEM_PARAMETERS)
+
