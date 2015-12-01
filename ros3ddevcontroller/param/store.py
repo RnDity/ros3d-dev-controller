@@ -149,6 +149,23 @@ class ParametersStore(object):
         return True
 
     @classmethod
+    def set_status(cls, name, status, notify=True):
+        """Set a parameter status
+
+        :param name str: parameter name
+        :param status ParameterStatus: instance of parameter status
+        :param notify bool: trigger parameter change notification chain
+        :return: True if successful"""
+
+
+        pdesc = cls._find_param(name)
+        pdesc.status = status
+        if notify:
+            cls.change_listeners.fire(pdesc)
+
+        return True
+
+    @classmethod
     def get(cls, name):
         """Get a parameter"""
 
