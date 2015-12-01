@@ -36,7 +36,7 @@ def parse_arguments():
     parser.add_argument('--list-snapshots', help='List available snapshots',
                         default=False, action='store_true')
     parser.add_argument('--download-snapshot', help='Download snapshot',
-                        default=False, action='store_true')
+                        default=None, type=int)
     return parser.parse_args()
 
 
@@ -114,6 +114,15 @@ def list_snapshots(url):
     print_response(requests.get(durl))
 
 
+def download_snapshot(url, snapshot_id):
+    logging.debug('list snapshots')
+
+    durl = urljoin(url, '/api/snapshots/{:d}'.format(snapshot_id))
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.get(durl))
+
+
 def main(opts):
     logging.info('connecting to: %s:%d', opts.host, opts.port)
 
@@ -128,6 +137,8 @@ def main(opts):
         save_snapshot(opts.url)
     elif opts.list_snapshots:
         list_snapshots(opts.url)
+    elif opts.download_snapshot:
+        download_snapshot(opts.url, opts.download_snapshot)
 
 
 if __name__ == '__main__':
