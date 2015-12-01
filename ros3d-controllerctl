@@ -24,10 +24,10 @@ def parse_arguments():
     parser.add_argument('--port',
                         help='Port, default: {}'.format(default_port),
                         default=default_port, type=int)
-    parser.add_argument('-l', '--list', action='store_true',
+    parser.add_argument('-l', '--list-parameters', action='store_true',
                         help='List parameters',
                         default=False)
-    parser.add_argument('-s', '--set',
+    parser.add_argument('-s', '--set-parameter',
                         help='Set parameters, format: <param>:<type>:<value>, ex: focus_distance_m:float:20; parameter types: float, int, str',
                         nargs='+',
                         default=[])
@@ -95,11 +95,11 @@ def main(opts):
 
     opts.url = 'http://{:s}:{:d}'.format(opts.host, opts.port)
 
-    if opts.list:
+    if opts.list_parameters:
         # list parameters
         list_params(opts.url)
-    elif opts.set:
-        set_params(opts.url, opts.set)
+    elif opts.set_parameter:
+        set_params(opts.url, opts.set_parameter)
 
 
 if __name__ == '__main__':
@@ -110,6 +110,6 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:
         # default to list
-        opts.list = True
+        opts.list_parameters = True
 
     main(opts)
