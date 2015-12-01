@@ -65,3 +65,8 @@ class Ros3DKRControllerService(Ros3DdevControllerService):
         ZeroconfTask,
         MQTTTask
     ]
+
+    def __init__(self, *args, **kwargs):
+        super(Ros3DKRControllerService, self).__init__(*args, **kwargs)
+
+        self.controller.set_servo(self.getTask(ServoTask))
