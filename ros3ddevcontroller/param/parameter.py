@@ -21,6 +21,14 @@ class ParameterStatus(object):
         self.write = write
         self.status = status_type
 
+    def set_status(self, status):
+        """Set parameter status
+
+        :param status: one of HARDWARE, SOFTWARE"""
+        if status not in [ParameterStatus.HARDWARE, ParameterStatus.SOFTWARE]:
+            raise ValueError('invalid status {}'.format(status))
+        self.status = status
+
 
 class Parameter(object):
     """System parameter wrapper"""

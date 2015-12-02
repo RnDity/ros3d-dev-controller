@@ -50,3 +50,10 @@ class ParameterTestCase(unittest.TestCase):
 
         par = ReadOnlyParameter('foo', 'bar', str)
         self.assertTrue(par.is_read_only())
+
+    def test_set_status(self):
+
+        status = ParameterStatus(status_type=ParameterStatus.SOFTWARE)
+
+        status.set_status(ParameterStatus.HARDWARE)
+        self.assertEqual(status.status, ParameterStatus.HARDWARE)
