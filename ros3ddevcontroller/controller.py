@@ -16,6 +16,7 @@ class Controller(object):
 
     def set_servo(self, servo):
         """Servo interface"""
+        self.logger.debug('setting servo to %s', servo)
         self.servo = servo
 
     def set_snapshots_location(self, loc):
