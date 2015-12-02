@@ -24,7 +24,7 @@ class ParameterTestCase(unittest.TestCase):
         self.assertIsInstance(status, ParameterStatus)
         self.assertEqual(status.read, True)
         self.assertEqual(status.write, True)
-        self.assertEqual(status.status, ParameterStatus.HARDWARE)
+        self.assertEqual(status.status, ParameterStatus.SOFTWARE)
 
     def test_new_status(self):
         st = ParameterStatus()
