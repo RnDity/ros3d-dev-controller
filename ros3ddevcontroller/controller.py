@@ -27,9 +27,74 @@ class Controller(object):
         # update snapshots backend
         self.snapshots_backend = FileSnapshotBackend(self.snapshots_location)
 
-    def apply_param(self, param):
-        """Apply parameter"""
+    def is_servo_parameter(self, param):
+        """Return true if parameter is applicable to servo"""
+        return ParametersStore.is_servo_parameter(param.name)
+
+    def apply_servo_parameter(self, param):
+        """Apply parameter to servo
+
+        :param param Parameter: parameter to apply
+        :rtype: bool
+        :return: True if successful"""
+        raise NotImplemented('not implemented')
+    def is_camera_parameter(self, param):
+        """Return True if parameter is applicable to camera"""
+        return ParametersStore.is_camera_parameter(param.name)
+
+    def apply_camera_parameter(self, param):
+        """Apply camera parameter
+
+        :param param Parameter: parameter to apply
+        :rtype: bool
+        :return: True if successful"""
         raise NotImplementedError('not implemented')
+
+    def apply_other_parameter(self, param):
+        """Apply parameter directly in parameter store, i.e. skipping any
+        interaction with external devices.
+
+        :param param Parameter:
+        :rtype: bool
+        :return: True"""
+        value = param.value
+        name = param.name
+        ParametersStore.set(name, value)
+        return True
+
+    def apply_single_parameter(self, param):
+        """Apply single parameter
+
+        :param param Parameter: parameter descriptor"""
+        if self.is_servo_parameter(param):
+            status = self.apply_servo_parameter(param)
+        elif self.is_camera_parameter(param):
+            status = self.apply_camera_parameter(param)
+        else:
+            status = self.apply_other_parameter(param)
+        return status
+
+    def apply_parameters(self, params):
+        """Apply a parameter set
+
+        :param params list of ParamDesc: list of parameters to apply
+        :rtype: list(Parameter)
+        :return: list of parameters applied"""
+        # record changed parameter descriptors
+        changed_params = []
+
+        # apply parameters serially, note that if any parameter takes
+        # longer to aplly this will contribute to wait time of the
+        # whole request
+        for param in params:
+            applied = self.apply_single_parameter(param)
+
+            # param validation was successful and was applied to servo
+            if applied:
+                par = ParametersStore.get(param.name)
+                changed_params.append(par)
+
+        return changed_params
 
     def get_parameters(self):
         """Return a dict with all parameters in the system"""
