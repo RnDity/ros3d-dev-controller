@@ -9,7 +9,6 @@ import logging
 import tornado.web
 from tornado.escape import json_decode, json_encode
 from sparts.tasks.tornado import TornadoHTTPTask
-from tornado import gen
 from ros3ddevcontroller.param  import ParametersStore
 from ros3ddevcontroller.bus.servo import ServoTask, ParamApplyError
 from ros3ddevcontroller.web.codec import ParameterCodec, ParameterCodecError
@@ -117,55 +116,6 @@ class ParametersUpdateHandler(TaskRequestHandler):
                 raise InvalidDataError("Incorrect value type of parameter %s" % (param.name))
 
         return req
-
-    @gen.coroutine
-    def _apply_parameters(self, req):
-        """Apply parameters that came in request
-
-        :param dict req: dictionary with parameters found in request
-        :return: dict of changed parameters with their values
-        """
-        # record changed parameters
-        changed_params = []
-
-        # apply parameters serially, note that if any parameter takes
-        # longer to aplly this will contribute to wait time of the
-        # whole request
-        for param in req:
-            servo = self.task.get_servo()
-            value = param.value
-            name = param.name
-            try:
-                if servo and servo.is_active():
-                    applied = yield self.apply_param(name, value)
-                else:
-                    applied = True
-            except ParamApplyError:
-                applied = False
-
-            # param validation was successful and was applied to servo
-            if applied:
-                ParametersStore.set(name, value)
-            else:
-                raise RequestFailedError('Failed to apply parameter %s' % (name))
-            par = ParametersStore.get(name)
-            changed_params.append(par)
-
-        raise gen.Return(changed_params)
-
-    @gen.coroutine
-    def apply_param(self, param, value):
-        """Apply a single parameter
-
-        :return: Future with result"""
-        _log.debug('set servo param')
-        try:
-            res = yield self.task.get_servo().change_param(param, value)
-            _log.debug('apply result: %s', res)
-        except ParamApplyError:
-            _log.exception('error when applying a parameter')
-            res = False
-        raise gen.Return(res)
 
     def put(self):
         _log.debug("ParametersUpdateHandler() Request: %s", self.request)
