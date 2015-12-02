@@ -6,7 +6,6 @@ from __future__ import absolute_import
 
 from sparts.tasks.dbus import DBusTask
 from sparts.sparts import option
-from concurrent.futures import Future
 from ros3ddevcontroller.param.store import ParametersStore
 import glib
 import logging
@@ -16,9 +15,11 @@ _log = logging.getLogger(__name__)
 
 
 class ParamApplyRequest(object):
-    """Wrapper for keeping a parameter apply request in check"""
+    """Wrapper for keeping a parameter apply request in check
+
+    :ivar param str: parameter name
+    :ivar value: parameter value"""
     def __init__(self, param, value):
-        self.future = Future()
         self.param = param
         self.value = value
 
@@ -132,50 +133,42 @@ class ServoTask(DBusTask):
         _log.debug('parameter value updated')
 
     def change_param(self, param, value):
-        """Attempt to set a parameter is servo. Does a trampoline through the
-        main loop. Returns a Future(), that the caller should wait for
-        to get a result.
+        """Attempt to set a parameter is servo.
 
-        :rtype: concurrent.futures.Future()
+        :rtype: bool
+        :return: True if change request was sent successfuly
         """
         _log.debug('change param %s to %s', param, value)
         pa = ParamApplyRequest(param, value)
-        glib.idle_add(self._apply_param, pa)
-        return pa.future
+        return self._apply_param(pa)
 
     def _apply_param(self, request):
-        """Apply parameter. This is called in glib main loop idle
-        callback. Once the parameter has been applied, it will set the
-        Future() within `request` object to a result or an exception.
+        """Apply parameter to servo. Does not wait for servo to finish the
+        operation.
 
         :param ParamApply request: request object
+        :rtype: bool
+        :return: True if parameter was sent to servo
+
         """
         _log.debug('apply param: %s -> %s', request.param, request.value)
-        future = request.future
-        # servo proxy might have gone away before we reached this
-        # callback
-        if not self.servo:
-            _log.debug('no servo at this time, request fails')
-            future.set_result(False)
-            return
-
         try:
             res = self.servo.setValue(request.param,
                                       request.value,
                                       timeout=ServoTask.SERVO_CALL_TIMEOUT_S)
             _log.debug('parameter \'%s\' -> %s set request done, result: %s ',
                        request.param, request.value, res)
-            # setValue has signature 'by'
-            future.set_result(res[0])
         except Exception as err:
             # TODO: catch DBus exception instead of Exception
             _log.exception('error when setting %s -> %s:',
                            request.param, request.value)
-            future.set_exception(ParamApplyError('failed to apply parameter'))
+            return False
+        else:
+            return True
 
     def is_active(self):
         """Check if servo can be used"""
-        _log.debug('servo active?')
+        _log.debug('servo active? %s', 'yes' if self.servo else 'no')
         if self.servo:
             return True
         return False
