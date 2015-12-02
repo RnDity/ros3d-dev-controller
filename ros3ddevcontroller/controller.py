@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 import logging
 import datetime
-from ros3ddevcontroller.param.store import ParametersStore, ParameterSnapshotter, ParameterLoader
+from ros3ddevcontroller.param.store import ParametersStore, ParameterSnapshotter
 from ros3ddevcontroller.param.backends import FileSnapshotBackend
 from ros3ddevcontroller.util import make_dir
 
