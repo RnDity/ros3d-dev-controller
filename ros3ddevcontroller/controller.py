@@ -4,6 +4,7 @@ import logging
 import datetime
 from ros3ddevcontroller.param.store import ParametersStore, ParameterSnapshotter
 from ros3ddevcontroller.param.backends import FileSnapshotBackend
+from ros3ddevcontroller.bus import servo
 from ros3ddevcontroller.util import make_dir
 
 
@@ -37,7 +38,20 @@ class Controller(object):
         :param param Parameter: parameter to apply
         :rtype: bool
         :return: True if successful"""
-        raise NotImplemented('not implemented')
+        value = param.value
+        name = param.name
+        self.logger.debug('set servo param')
+        try:
+            if self.servo.is_active():
+                res = self.servo.change_param(param.name, value)
+                self.logger.debug('apply result: %s', res)
+                return res
+            else:
+                return self.apply_other_parameter(param)
+        except servo.ParamApplyError:
+            self.logger.exception('error when applying a parameter')
+            return False
+
     def is_camera_parameter(self, param):
         """Return True if parameter is applicable to camera"""
         return ParametersStore.is_camera_parameter(param.name)
