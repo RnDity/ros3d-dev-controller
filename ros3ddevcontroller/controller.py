@@ -64,6 +64,10 @@ class Controller(object):
         :return: True if successful"""
         raise NotImplementedError('not implemented')
 
+    def is_parameter_writable(self, param):
+        """Return True if parameter is applicable to camera"""
+        return ParametersStore.is_read_only(param.name) == False
+
     def apply_other_parameter(self, param):
         """Apply parameter directly in parameter store, i.e. skipping any
         interaction with external devices.
@@ -80,7 +84,10 @@ class Controller(object):
         """Apply single parameter
 
         :param param Parameter: parameter descriptor"""
-        if self.is_servo_parameter(param):
+        if not self.is_parameter_writable(param):
+            self.logger.warning('parameter %s is read-only, skipping', param.name)
+            status = False
+        elif self.is_servo_parameter(param):
             status = self.apply_servo_parameter(param)
         elif self.is_camera_parameter(param):
             status = self.apply_camera_parameter(param)
