@@ -167,13 +167,12 @@ class ParametersUpdateHandler(TaskRequestHandler):
             res = False
         raise gen.Return(res)
 
-    @gen.coroutine
     def put(self):
         _log.debug("ParametersUpdateHandler() Request: %s", self.request)
 
         try:
             req = self._validate_request(self.request.body)
-            changed_params = yield self._apply_parameters(req)
+            changed_params = self.task.controller.apply_parameters(req)
             self.write(ParameterCodec(as_set=True).encode(changed_params))
 
         except APIError as err:
