@@ -34,6 +34,7 @@ class FileSnapshotBackend(ParameterSnapshotBackend):
                             str(new_id))
         self.logger.debug('saving snapshot to: %s', path)
         self._save_snapshot(path, parameters)
+        return new_id
 
     def load(self, snapshot_id):
         """Retrieve snapshot data
