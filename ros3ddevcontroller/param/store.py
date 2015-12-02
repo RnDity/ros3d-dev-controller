@@ -197,7 +197,10 @@ class ParameterSnapshotBackend(object):
     def save(self, parameters):
         """Save parameters snapshot
 
-        :param parameters list: list of Parameter entries"""
+        :param parameters list: list of Parameter entries
+        :rtype int:
+        :return: snapshot ID
+        """
         raise NotImplementedError('{:s} needs implementation'.format(__name__))
 
     def load(self, snapshot_id):
@@ -217,10 +220,13 @@ class ParameterSnapshotter(object):
     def save(cls, backend=None):
         """Save parameter using backend `backend`
 
-        :param backend ParameterSnapshotBackend: a ParameterSnapshotBackend instance"""
+        :param backend ParameterSnapshotBackend: a ParameterSnapshotBackend instance
+        :rtype int:
+        :return: snapshot ID
+        """
         assert backend != None
 
         from ros3ddevcontroller.param.sysparams import SYSTEM_PARAMETERS
 
-        backend.save(SYSTEM_PARAMETERS)
+        return backend.save(SYSTEM_PARAMETERS)
 
