@@ -30,7 +30,7 @@ class Controller(object):
         """Apply parameter"""
         raise NotImplementedError('not implemented')
 
-    def get_params(self):
+    def get_parameters(self):
         """Return a dict with all parameters in the system"""
         return ParametersStore.parameters_as_dict()
 

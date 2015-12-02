@@ -92,7 +92,7 @@ class SystemStatusHandler(TaskRequestHandler):
 
 class ParametersListHandler(TaskRequestHandler):
     def get(self):
-        params = self.task.controller.get_params()
+        params = self.task.controller.get_parameters()
 
         _log.debug("ParametersListHandler() Response: %s" % params)
         self.write(params)
