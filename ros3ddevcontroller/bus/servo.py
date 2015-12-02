@@ -6,7 +6,8 @@ from __future__ import absolute_import
 
 from sparts.tasks.dbus import DBusTask
 from sparts.sparts import option
-from ros3ddevcontroller.param.store import ParametersStore
+from ros3ddevcontroller.param.store import ParametersStore, SERVO_PARAMETERS
+from ros3ddevcontroller.param.parameter import ParameterStatus
 import glib
 import logging
 import dbus
@@ -105,8 +106,20 @@ class ServoTask(DBusTask):
         if not name:
             _log.info('servo driver lost')
             self.servo = None
+            pstatus = ParameterStatus.SOFTWARE
         else:
             self._setup_servo_proxy()
+            pstatus = ParameterStatus.HARDWARE
+
+        self._set_servo_params_status(pstatus)
+
+    @classmethod
+    def _set_servo_params_status(cls, pstatus):
+        for pname in SERVO_PARAMETERS:
+            pdesc = ParametersStore.get(pname)
+            pdesc_status = pdesc.status
+            pdesc_status.set_status(pstatus)
+            ParametersStore.set_status(pname, pdesc_status)
 
     def _setup_servo_proxy(self):
         """Setup proxy to servo service, call only whe name is resolvable"""
