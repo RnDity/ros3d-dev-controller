@@ -27,7 +27,7 @@ SYSTEM_PARAMETERS = [
     Parameter('notes', '', str),
 
     # cli parameters
-    ReadOnlyParameter('canera_id', 'A', str),
+    ReadOnlyParameter('camera_id', 'A', str),
     Parameter('record_framerate', 25, float),
     Parameter('shutter_deg', 180, float),
     Parameter('iso', 800, int),
