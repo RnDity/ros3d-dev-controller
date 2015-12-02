@@ -56,6 +56,9 @@ class Parameter(object):
         self.evaluated = evaluated
         self.evaluator = evaluator
 
+    def is_read_only(self):
+        return self.status.write == False
+
 
 class ReadOnlyParameter(Parameter):
     """Read only parameter wrapper"""

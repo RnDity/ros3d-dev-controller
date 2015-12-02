@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import unittest
 import mock
 
-from ros3ddevcontroller.param.parameter import Parameter, ParameterStatus
+from ros3ddevcontroller.param.parameter import Parameter, ReadOnlyParameter, ParameterStatus
 
 class ParameterTestCase(unittest.TestCase):
     def test_new_no_status(self):
@@ -43,3 +43,10 @@ class ParameterTestCase(unittest.TestCase):
         self.assertRaises(AssertionError, Parameter,
                           'foo', 'bar', str, status=1)
 
+    def test_read_only(self):
+        par = Parameter('foo', 'bar', str)
+
+        self.assertFalse(par.is_read_only())
+
+        par = ReadOnlyParameter('foo', 'bar', str)
+        self.assertTrue(par.is_read_only())
