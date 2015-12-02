@@ -72,3 +72,21 @@ class Controller(object):
         if not sdata:
             self.logger.error('failed to load snapshot data for ID %d', snapshot_id)
         return sdata
+
+    def delete_snapshot(self, snapshot_id):
+        """Remove snapshot snapshot `snapshot_id`.
+
+        :param snapshot_id int: ID of snapshot
+        :return: ID of removed snapshot
+
+        """
+        self.logger.debug('delete snapshot %d', snapshot_id)
+        return self.snapshots_backend.delete(snapshot_id)
+
+    def delete_all(self):
+        """Remove all snapshots.
+
+        :return: list of removed snapshot IDs
+
+        """
+        return self.snapshots_backend.delete_all()
