@@ -201,8 +201,17 @@ class SnapshotsListHandler(TaskRequestHandler):
         except APIError as err:
             self._respond_with_error(err)
 
+    def delete(self):
+        _log.debug("SnapshotsListHandler() Request: %s", self.request)
+        try:
+            deleted_snapshots = self.task.controller.delete_all()
+            self.write(json_encode(deleted_snapshots))
+        except APIError as err:
+            self._respond_with_error(err)
 
-class SnapshotGetHandler(TaskRequestHandler):
+
+
+class SnapshotHandler(TaskRequestHandler):
     def get(self, snapshot_id):
         _log.debug("SnapshotsGetHandler() Request: %s", self.request)
 
@@ -214,6 +223,19 @@ class SnapshotGetHandler(TaskRequestHandler):
             self.write(ParameterCodec(as_set=True).encode(snapshot))
         except APIError as err:
             self._respond_with_error(err)
+
+    def delete(self, snapshot_id):
+        _log.debug("SnapshotsGetHandler() Request: %s", self.request)
+
+        try:
+            sid = int(snapshot_id)
+            _log.debug("get snapshot: %d", sid)
+
+            deleted_sid = self.task.controller.delete_snapshot(sid)
+            self.write(json_encode([deleted_sid]))
+        except APIError as err:
+            self._respond_with_error(err)
+
 
 
 class ServosCalibrateHandler(TaskRequestHandler):
@@ -239,7 +261,7 @@ class WebAPITask(TornadoHTTPTask):
             (r"/api/parameters/update", ParametersUpdateHandler, dict(task=self)),
             (r"/api/snapshots/list", SnapshotsListHandler, dict(task=self)),
             (r"/api/snapshots/capture", SnapshotsCaptureHandler, dict(task=self)),
-            (r"/api/snapshots/(\d)", SnapshotGetHandler, dict(task=self)),
+            (r"/api/snapshots/(\d)", SnapshotHandler, dict(task=self)),
             (r"/api/servo/calibrate", ServosCalibrateHandler, dict(task=self)),
             (r"/api/servo/connected", ServosConnectedHandler, dict(task=self)),
         ]
