@@ -185,7 +185,8 @@ class SnapshotsCaptureHandler(TaskRequestHandler):
         _log.debug("SnapshotsCaptureHandler() Request: %s", self.request)
 
         try:
-            self.task.controller.take_snapshot()
+            snapshot_id = self.task.controller.take_snapshot()
+            self.write(json_encode([snapshot_id]))
         except APIError as err:
             self._respond_with_error(err)
 
