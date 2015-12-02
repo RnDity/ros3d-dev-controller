@@ -7,7 +7,7 @@ import unittest
 import mock
 
 from ros3ddevcontroller.param.store import ParametersStore, ParameterLoader
-from ros3ddevcontroller.param.parameter import Parameter
+from ros3ddevcontroller.param.parameter import Parameter, ReadOnlyParameter
 
 class StoreLoadingTestCase(unittest.TestCase):
     def setUp(self):
@@ -208,3 +208,17 @@ class CameraServoTestCase(StoreLoadingTestCase):
         for p in self.servo_parameters:
             self.assertFalse(ParametersStore.is_camera_parameter(p))
 
+
+class ReadOnlyParameterTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        ParametersStore.load_parameters([
+            ReadOnlyParameter('foo-readonly', 'bar', str),
+            Parameter('foo-writable', 'bar', str)
+        ])
+
+    def test_parameter_readonly(self):
+
+        self.assertTrue(ParametersStore.is_read_only('foo-readonly'))
+        self.assertFalse(ParametersStore.is_read_only('foo-writable'))

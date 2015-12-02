@@ -70,6 +70,15 @@ class ParametersStore(object):
         return name in CAMERA_PARAMETERS
 
     @classmethod
+    def is_read_only(cls, name):
+        """Test if parameter with given `name` is read only
+
+        :param name str: parameter name
+        :return: True if read only"""
+        pdesc = cls.get(name)
+        return pdesc.is_read_only()
+
+    @classmethod
     def load_parameters(cls, params):
         """Load parameters from list
 
