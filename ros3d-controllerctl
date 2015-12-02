@@ -37,6 +37,10 @@ def parse_arguments():
                         default=False, action='store_true')
     parser.add_argument('--download-snapshot', help='Download snapshot',
                         default=None, type=int)
+    parser.add_argument('--delete-snapshot', help='Delete snapshot',
+                        default=None, type=int)
+    parser.add_argument('--delete-all-snapshots', help='Delete all snapshots',
+                        default=False, action='store_true')
     return parser.parse_args()
 
 
@@ -114,6 +118,15 @@ def list_snapshots(url):
     print_response(requests.get(durl))
 
 
+def delete_all_snapshots(url):
+    logging.debug('delete all snapshots')
+
+    durl = urljoin(url, '/api/snapshots/list')
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.delete(durl))
+
+
 def download_snapshot(url, snapshot_id):
     logging.debug('download snapshot %s', snapshot_id)
 
@@ -121,6 +134,15 @@ def download_snapshot(url, snapshot_id):
     logging.debug('request to URL: %s', durl)
 
     print_response(requests.get(durl))
+
+
+def delete_snapshot(url, snapshot_id):
+    logging.debug('delete snapshot %s', snapshot_id)
+
+    durl = urljoin(url, '/api/snapshots/{:d}'.format(snapshot_id))
+    logging.debug('request to URL: %s', durl)
+
+    print_response(requests.delete(durl))
 
 
 def main(opts):
@@ -139,6 +161,10 @@ def main(opts):
         list_snapshots(opts.url)
     elif opts.download_snapshot:
         download_snapshot(opts.url, opts.download_snapshot)
+    elif opts.delete_snapshot:
+        delete_snapshot(opts.url, opts.delete_snapshot)
+    elif opts.delete_all_snapshots:
+        delete_all_snapshots(opts.url)
 
 
 if __name__ == '__main__':
