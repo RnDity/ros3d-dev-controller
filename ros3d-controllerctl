@@ -115,7 +115,7 @@ def list_snapshots(url):
 
 
 def download_snapshot(url, snapshot_id):
-    logging.debug('list snapshots')
+    logging.debug('download snapshot %s', snapshot_id)
 
     durl = urljoin(url, '/api/snapshots/{:d}'.format(snapshot_id))
     logging.debug('request to URL: %s', durl)
