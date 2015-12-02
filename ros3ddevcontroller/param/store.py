@@ -14,7 +14,7 @@ from __future__ import absolute_import
 
 from ros3ddevcontroller.param.parameter import Parameter
 from ros3ddevcontroller.web.codec import ParameterCodec
-
+from ros3ddevcontroller.param.sysparams import CAMERA_PARAMETERS, SERVO_PARAMETERS
 import logging
 
 
@@ -52,13 +52,29 @@ class ParametersStore(object):
 
     change_listeners = ParametersStoreListener()
 
+    @staticmethod
+    def is_servo_parameter(name):
+        """Test if parameter with name `name` is applicable to servo
+
+        :param name str: parameter name
+        :return: True if is a servo parameter"""
+        return name in SERVO_PARAMETERS
+
+    @staticmethod
+    def is_camera_parameter(name):
+        """Test if parameter with name `name` is applicable to camera
+
+        :param name str: parameter name
+        :return: True if is a camera parameter
+        """
+        return name in CAMERA_PARAMETERS
+
     @classmethod
     def load_parameters(cls, params):
         """Load parameters from list
 
         :param list params: list of Parameter objects
         """
-
         for p in params:
             assert p.name not in cls.PARAMETERS
             cls.PARAMETERS[p.name] = p

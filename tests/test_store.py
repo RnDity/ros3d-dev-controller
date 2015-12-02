@@ -186,4 +186,25 @@ class ListenerTestCase(StoreLoadingTestCase):
         ParametersStore.change_listeners.remove(None)
 
 
+class CameraServoTestCase(StoreLoadingTestCase):
+
+    def setUp(self):
+        super(CameraServoTestCase, self).setUp()
+        from ros3ddevcontroller.param.sysparams import SERVO_PARAMETERS, CAMERA_PARAMETERS
+        self.servo_parameters = SERVO_PARAMETERS
+        self.camera_parameters = CAMERA_PARAMETERS
+
+    def test_servo(self):
+
+        for p in self.servo_parameters:
+            self.assertTrue(ParametersStore.is_servo_parameter(p))
+        for p in self.camera_parameters:
+            self.assertFalse(ParametersStore.is_servo_parameter(p))
+
+    def test_camera(self):
+
+        for p in self.camera_parameters:
+            self.assertTrue(ParametersStore.is_camera_parameter(p))
+        for p in self.servo_parameters:
+            self.assertFalse(ParametersStore.is_camera_parameter(p))
 
