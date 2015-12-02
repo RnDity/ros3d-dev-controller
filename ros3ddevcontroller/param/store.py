@@ -211,6 +211,24 @@ class ParameterSnapshotBackend(object):
         :return: list of Parameter entries"""
         raise NotImplementedError('{:s} needs implementation'.format(__name__))
 
+    def delete(self, snapshot_id):
+        """Remove snapshot of ID `snapshot_id`.
+
+        :param snapshot_id int: ID of snapshot
+        :rtype int:
+        :return: ID of removed snapshot
+
+        """
+        raise NotImplementedError('{:s} needs implementation'.format(__name__))
+
+    def delete_all(self):
+        """Remove all snapshots.
+        :rtype list(int):
+        :return: list of removed snapshots
+
+        """
+        raise NotImplementedError('{:s} needs implementation'.format(__name__))
+
 
 class ParameterSnapshotter(object):
     """Utility class for saving a snapshot of all parameters to specified

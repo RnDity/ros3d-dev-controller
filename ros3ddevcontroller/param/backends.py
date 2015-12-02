@@ -52,6 +52,32 @@ class FileSnapshotBackend(ParameterSnapshotBackend):
             snapshot_data = ParameterCodec(as_set=True).decode(inf.read())
         return snapshot_data
 
+    def delete(self, snapshot_id):
+        """Remove snapshot snapshot `snapshot_id`.
+
+        :param snapshot_id int: ID of snapshot
+        :return: ID of removed snapshot
+
+        """
+        self.logger.debug('delete snapshot %d', snapshot_id)
+
+        path = self._build_snapshot_path(snapshot_id)
+        if os.path.exists(path):
+            os.remove(path)
+        return snapshot_id
+
+    def delete_all(self):
+        """Remove all snapshots.
+
+        :return: list of removed snapshots
+
+        """
+        self.logger.warning('remove all snapshots')
+        snapshots = self._list_snapshot_ids()
+        for snapshot in snapshots:
+            self.delete(snapshot)
+        return snapshots
+
     def _build_snapshot_path(self, sid):
         """Return a path to snapshot file with given ID
 
