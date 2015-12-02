@@ -41,10 +41,13 @@ class Controller(object):
                             notify=False)
 
     def take_snapshot(self):
+        """Record a snapshot of current parameter set
+        :return: ID of snapshot
+        """
         # record timestamp
         self._record_timestamp()
 
-        ParameterSnapshotter.save(self.snapshots_backend)
+        return ParameterSnapshotter.save(self.snapshots_backend)
 
     def list_snapshots(self):
         """List IDs of available snapshots
