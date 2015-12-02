@@ -7,6 +7,17 @@ from __future__ import absolute_import
 
 from ros3ddevcontroller.param.parameter import *
 
+SERVO_PARAMETERS = [
+    'baseline_mm',
+    'focus_distance_m',
+    'focal_length_mm',
+    'aperture'
+]
+
+CAMERA_PARAMETERS = [
+    'iso'
+]
+
 SYSTEM_PARAMETERS = [
     # shot parameters
     Parameter('scene_no', '', str),
