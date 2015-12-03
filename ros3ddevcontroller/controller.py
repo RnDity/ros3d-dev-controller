@@ -1,3 +1,6 @@
+#
+# Copyright (c) 2015, Open-RnD Sp. z o.o.  All rights reserved.
+#
 """Core Ros3D controller logic"""
 from __future__ import absolute_import
 import logging
