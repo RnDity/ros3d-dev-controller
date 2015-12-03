@@ -143,8 +143,16 @@ class DofFarCalc(DofHelperCalc):
         return far
 
 class DofTotalCalc(Evaluator):
-    pass
 
+    REQUIRES = [
+        'dof_near_m',
+        'dof_far_m'
+    ]
+
+    def __call__(self):
+        dof_far = ParametersStore.get('dof_near_m').value
+        dof_near = ParametersStore.get('dof_near_m').value
+        return dof_far.value - dof_near.value
 
 class FovHorizontalDegCalc(Evaluator):
     pass
