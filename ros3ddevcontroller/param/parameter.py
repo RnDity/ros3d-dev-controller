@@ -168,8 +168,16 @@ class FovDiagonalDegCalc(Evaluator):
 
 
 class ConvergenceDegCalc(Evaluator):
-    pass
 
+    REQUIRES = [
+        'baseline_mm',
+        'distance_screen_m'
+    ]
+
+    def __call__(self):
+        baseline = ParametersStore.get('baseline_mm').value
+        screen = ParametersStore.get('distance_screen_m').value
+        return 2 * math.degrees(math.atan((baseline / 2) / screen))
 
 class ConvergencePxCalc(Evaluator):
     pass
