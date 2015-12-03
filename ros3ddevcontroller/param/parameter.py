@@ -5,6 +5,7 @@
 
 from __future__ import absolute_import
 
+import math
 import logging
 
 _log = logging.getLogger(__name__)
