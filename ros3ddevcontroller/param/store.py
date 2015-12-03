@@ -201,6 +201,14 @@ class ParametersStore(object):
 
         return pdesc
 
+    @classmethod
+    def get_parameters(cls):
+        """Obtaina list of all parameters, symmetric to load_parameters() call
+
+        :rtype: list(Parameter)
+        :return: list of parmeters"""
+        return cls.PARAMETERS.values()
+
 
 class ParameterLoader(object):
     """Utility class for loading up a paramteres from a set"""
