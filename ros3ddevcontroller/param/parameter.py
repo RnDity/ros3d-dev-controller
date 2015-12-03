@@ -109,9 +109,22 @@ class DofHelperCalc(Evaluator):
 
         return h, hs
 
-class DofNearCalc(Evaluator):
-    pass
+class DofNearCalc(DofHelperCalc):
 
+    def __call__(self):
+        coc_um = ParametersStore.get('coc_um').value
+        focus = ParametersStore.get('focus_distance_m').value
+
+        if coc_um == 0:
+            return focus
+
+        h, hs = DofHelperCalc.calc_h_hs()
+
+        if focus == float('inf'):
+            return h
+
+        near = hs / (h + focus)
+        return near
 
 class DofFarCalc(Evaluator):
     pass
