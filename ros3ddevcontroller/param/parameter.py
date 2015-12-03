@@ -180,8 +180,22 @@ class ConvergenceDegCalc(Evaluator):
         return 2 * math.degrees(math.atan((baseline / 2) / screen))
 
 class ConvergencePxCalc(Evaluator):
-    pass
 
+    REQUIRES = [
+        'frame_width_px',
+        'baseline_mm',
+        'distance_screen_m',
+        'frame_width_mm',
+        'focal_length_mm'
+    ]
+
+    def __call__(self):
+        frame_width_px = ParametersStore.get('frame_width_px')
+        baseline = ParametersStore.get('baseline_mm')
+        screen = ParametersStore.get('distance_screen_m')
+        frame_width_mm = ParamtersStore.get('frame_width_mm')
+        focal_length = ParametersStore.get('focal_length_mm')
+        return frame_width_px * math.atan(baseline / (2 * 1000 * screen))  / math.atan(frame_width_mm / (2 * focal_length));
 
 class ParallaxNearPercentCalc(Evaluator):
     pass
