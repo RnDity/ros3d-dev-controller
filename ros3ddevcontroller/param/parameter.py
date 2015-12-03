@@ -30,6 +30,9 @@ class ParameterStatus(object):
             raise ValueError('invalid status {}'.format(status))
         self.status = status
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 class Parameter(object):
     """System parameter wrapper"""
@@ -67,6 +70,9 @@ class Parameter(object):
 
     def is_read_only(self):
         return self.status.write == False
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
 
 
 class ReadOnlyParameter(Parameter):
