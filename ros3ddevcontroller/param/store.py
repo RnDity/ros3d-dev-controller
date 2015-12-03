@@ -277,7 +277,5 @@ class ParameterSnapshotter(object):
         """
         assert backend != None
 
-        from ros3ddevcontroller.param.sysparams import SYSTEM_PARAMETERS
-
-        return backend.save(SYSTEM_PARAMETERS)
+        return backend.save(ParametersStore.get_parameters())
 
