@@ -83,6 +83,31 @@ class Evaluator(object):
     def __call__(self):
         raise NotImplementedError('Evaluation for {} not implemented'.format(self.__name__))
 
+class DofHelperCalc(Evaluator):
+
+    REQUIRES = [
+        'focus_distance_m',
+        'focal_length_mm',
+        'aperture',
+        'coc_um'
+        'frame_width_px',
+        'sensor_width_px'
+    ]
+
+    @staticmethod
+    def calc_h_hs():
+        focal_length = ParametersStore.get('focal_length_mm').value
+        aperture = ParametersStore.get('aperture').value
+        frame_width_px = ParametersStore.get('frame_width_px').value
+        sensor_width_px = ParametersStore.get('sensor_width_px').value
+        coc_um = ParametersStore.get('coc_um').value
+
+        coc_mm = coc_um / 1000.
+        ratio = frame_width_px / sensor_width_px
+        h = 0.001 * (focal_length * focal_length) / (coc_mm * ratio * aperture)
+        hs = h * focus
+
+        return h, hs
 
 class DofNearCalc(Evaluator):
     pass
