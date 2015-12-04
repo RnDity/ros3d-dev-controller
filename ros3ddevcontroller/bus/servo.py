@@ -7,7 +7,6 @@ from __future__ import absolute_import
 from ros3ddevcontroller.param.store import ParametersStore, SERVO_PARAMETERS
 from ros3ddevcontroller.param.parameter import ParameterStatus, Infinity
 from ros3ddevcontroller.bus.client import DBusClientTask
-import logging
 import dbus
 
 
