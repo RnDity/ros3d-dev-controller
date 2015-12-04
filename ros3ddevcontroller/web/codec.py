@@ -32,8 +32,13 @@ class ParameterCodec(object):
     @staticmethod
     def parameter_to_dict(param):
         """Convert Parameter to JSON serializable dict"""
+        if param.value_type == float:
+            value = parameter.Infinity.convert_to(param.value)
+        else:
+            value = param.value
+
         ad = {
-            "value": param.value,
+            "value": value,
             "type": param.value_type.__name__,
             "status": ParameterCodec.status_as_dict(param.status),
         }
@@ -102,6 +107,10 @@ class ParameterCodec(object):
             if 'value' not in val:
                 raise ParameterCodecError('Missing \'value\' field')
 
-            params.append(parameter.Parameter(param, val['value'],
-                          type(val['value'])))
+            value = val['value']
+            if type(value) == float:
+                value = parameter.Infinity.convert_from(value)
+
+            params.append(parameter.Parameter(param, value,
+                          type(value)))
         return params
