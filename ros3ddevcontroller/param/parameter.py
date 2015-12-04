@@ -240,24 +240,51 @@ class ConvergencePxCalc(Evaluator):
     ]
 
     def __call__(self):
-        frame_width_px = ParametersStore.get('frame_width_px')
-        baseline = ParametersStore.get('baseline_mm')
-        screen = ParametersStore.get('distance_screen_m')
-        frame_width_mm = ParamtersStore.get('frame_width_mm')
-        focal_length = ParametersStore.get('focal_length_mm')
+        frame_width_px = ParametersStore.get('frame_width_px').value
+        baseline = ParametersStore.get('baseline_mm').value
+        screen = ParametersStore.get('distance_screen_m').value
+        frame_width_mm = ParamtersStore.get('frame_width_mm').value
+        focal_length = ParametersStore.get('focal_length_mm').value
         return frame_width_px * math.atan(baseline / (2 * 1000 * screen))  / math.atan(frame_width_mm / (2 * focal_length));
 
-class ParallaxNearPercentCalc(Evaluator):
-    pass
+class ParallaxPercentHelperCalc(Evaluator):
 
+    REQUIRES = [
+        'baseline_mm',
+        'focal_length_mm',
+        'frame_width_mm',
+        'distance_screen_m'
+    ]
+
+    @staticmethod
+    def calc_parallax_percent(distance):
+
+        baseline = ParametersStore.get('baseline_mm').value
+        focal_length = ParametersStore.get('focal_lenght_mm').value
+        frame_width_mm = ParametersStore.get('frame_width_mm').value
+        distance_screen = ParametersStore.get('distance_screen_m').value
+        return 100 * (baseline * focal_length) / frame_width_mm * (1 / (1000 * distance_screen) - 1 / (1000 * distance))
+
+class ParallaxNearPercentCalc(ParallaxPercentHelperCalc):
+
+    def __init__(self):
+        self.REQUIRES.append('distance_near_m')
+
+    def __call__(self):
+        distance_near = ParametersStore.get('distance_near_m').value
+        return ParallaxPercentHelperCalc(distance_near)
 
 class ParallaxScreenPercentCalc(Evaluator):
     pass
 
+class ParallaxFarPercentCalc(ParallaxPercentHelperCalc):
 
-class ParallaxFarPercentCalc(Evaluator):
-    pass
+    def __init__(self):
+        self.REQUIRES.append('distance_far_m')
 
+    def __call__(self):
+        distance_far = ParametersStore.get('distance_far_m').value
+        return ParallaxPercentHelperCalc(distance_far)
 
 class ParallaxObject1PercentCalc(Evaluator):
     pass
