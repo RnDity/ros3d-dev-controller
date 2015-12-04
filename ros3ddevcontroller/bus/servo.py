@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from sparts.tasks.dbus import DBusTask
 from sparts.sparts import option
 from ros3ddevcontroller.param.store import ParametersStore, SERVO_PARAMETERS
-from ros3ddevcontroller.param.parameter import ParameterStatus
+from ros3ddevcontroller.param.parameter import ParameterStatus, Infinity
 import glib
 import logging
 import dbus
@@ -136,6 +136,7 @@ class ServoTask(DBusTask):
     def _servo_value_changed(self, parameter, motor, limit, in_progress, value):
         """pl.ros3d.servo.valueChanged signal handler"""
         _log.debug('got signal for parameter %s, value: %d', parameter, value)
+        value = Infinity.convert_from(value)
         ParametersStore.set(parameter, value)
         _log.debug('parameter value updated')
 
@@ -146,6 +147,7 @@ class ServoTask(DBusTask):
         :return: True if change request was sent successfuly
         """
         _log.debug('change param %s to %s', param, value)
+        value = Infinity.convert_to(value)
         pa = ParamApplyRequest(param, value)
         return self._apply_param(pa)
 
