@@ -9,6 +9,7 @@ from ros3ddevcontroller.web import WebAPITask
 from ros3ddevcontroller.bus import Ros3DDBusTask
 from ros3ddevcontroller.bus.servo import ServoTask
 from ros3ddevcontroller.bus.zeroconf import ZeroconfTask
+from ros3ddevcontroller.bus.camera import CameraTask
 from ros3ddevcontroller.util import SystemConfigLoader, ControllerConfigLoader, get_eth_mac
 from ros3ddevcontroller.mqtt import MQTTTask
 from ros3ddevcontroller.controller import Controller
@@ -64,7 +65,8 @@ class Ros3DKRControllerService(Ros3DdevControllerService):
         WebAPITask,
         ServoTask,
         ZeroconfTask,
-        MQTTTask
+        MQTTTask,
+        CameraTask,
     ]
 
     def initService(self):
