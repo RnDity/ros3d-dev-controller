@@ -7,7 +7,6 @@ from __future__ import absolute_import
 from ros3ddevcontroller.param.store import ParametersStore, SERVO_PARAMETERS
 from ros3ddevcontroller.param.parameter import ParameterStatus, Infinity
 from ros3ddevcontroller.bus.client import DBusClientTask
-import dbus
 
 
 class ParamApplyRequest(object):
@@ -67,14 +66,8 @@ class ServoTask(DBusClientTask):
             return
 
         self.logger.debug('obtain proxy to servo')
-        try:
-            servo_obj = self.bus.get_object(self.DBUS_SERVICE_NAME,
-                                            self.SERVO_DBUS_PATH)
-            self.servo = dbus.Interface(servo_obj,
-                                        self.SERVO_DBUS_INTERFACE)
-        except dbus.DBusException:
-            self.logger.exception('failed to obtain proxy to servo')
-        else:
+        self.servo = self.get_proxy(self.SERVO_DBUS_PATH, self.SERVO_DBUS_INTERFACE)
+        if self.servo:
             self.logger.debug('got proxy')
             # connect to value change signal
             self.servo.connect_to_signal('valueChanged', self._servo_value_changed)
