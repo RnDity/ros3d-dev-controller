@@ -131,10 +131,9 @@ class ReadOnlyParameter(Parameter):
 
 
 class Evaluator(object):
-    NAME = 'unset'
 
     def __call__(self):
-        raise NotImplementedError('Evaluation for {} not implemented'.format(self.__name__))
+        raise NotImplementedError('Evaluation for {} not implemented'.format(self.__class__.__name__))
 
 class DofHelperCalc(Evaluator):
 
