@@ -10,8 +10,6 @@ from ros3ddevcontroller.bus.client import DBusClientTask
 import logging
 import dbus
 
-_log = logging.getLogger(__name__)
-
 
 class ParamApplyRequest(object):
     """Wrapper for keeping a parameter apply request in check
@@ -69,25 +67,25 @@ class ServoTask(DBusClientTask):
         if self.servo:
             return
 
-        _log.debug('obtain proxy to servo')
+        self.logger.debug('obtain proxy to servo')
         try:
             servo_obj = self.bus.get_object(self.DBUS_SERVICE_NAME,
                                             self.SERVO_DBUS_PATH)
             self.servo = dbus.Interface(servo_obj,
                                         self.SERVO_DBUS_INTERFACE)
         except dbus.DBusException:
-            _log.exception('failed to obtain proxy to servo')
+            self.logger.exception('failed to obtain proxy to servo')
         else:
-            _log.debug('got proxy')
+            self.logger.debug('got proxy')
             # connect to value change signal
             self.servo.connect_to_signal('valueChanged', self._servo_value_changed)
 
     def _servo_value_changed(self, parameter, motor, limit, in_progress, value):
         """pl.ros3d.servo.valueChanged signal handler"""
-        _log.debug('got signal for parameter %s, value: %d', parameter, value)
+        self.logger.debug('got signal for parameter %s, value: %d', parameter, value)
         value = Infinity.convert_from(value)
         ParametersStore.set(parameter, value)
-        _log.debug('parameter value updated')
+        self.logger.debug('parameter value updated')
 
     def change_param(self, param, value):
         """Attempt to set a parameter is servo.
@@ -95,7 +93,7 @@ class ServoTask(DBusClientTask):
         :rtype: bool
         :return: True if change request was sent successfuly
         """
-        _log.debug('change param %s to %s', param, value)
+        self.logger.debug('change param %s to %s', param, value)
         value = Infinity.convert_to(value)
         pa = ParamApplyRequest(param, value)
         return self._apply_param(pa)
@@ -109,16 +107,16 @@ class ServoTask(DBusClientTask):
         :return: True if parameter was sent to servo
 
         """
-        _log.debug('apply param: %s -> %s', request.param, request.value)
+        self.logger.debug('apply param: %s -> %s', request.param, request.value)
         try:
             res = self.servo.setValue(request.param,
                                       request.value,
                                       timeout=ServoTask.SERVO_CALL_TIMEOUT_S)
-            _log.debug('parameter \'%s\' -> %s set request done, result: %s ',
+            self.logger.debug('parameter \'%s\' -> %s set request done, result: %s ',
                        request.param, request.value, res)
         except Exception as err:
             # TODO: catch DBus exception instead of Exception
-            _log.exception('error when setting %s -> %s:',
+            self.logger.exception('error when setting %s -> %s:',
                            request.param, request.value)
             return False
         else:
@@ -126,7 +124,7 @@ class ServoTask(DBusClientTask):
 
     def is_active(self):
         """Check if servo can be used"""
-        _log.debug('servo active? %s', 'yes' if self.servo else 'no')
+        self.logger.debug('servo active? %s', 'yes' if self.servo else 'no')
         if self.servo:
             return True
         return False
