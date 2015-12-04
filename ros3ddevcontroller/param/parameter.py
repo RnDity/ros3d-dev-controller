@@ -328,7 +328,7 @@ class RealHeightScreenCalc(Evaluator):
     pass
 
 
-class RealHeightFarCalc(Evaluator):
+class RealWidthFarCalc(Evaluator):
     pass
 
 
