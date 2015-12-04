@@ -148,6 +148,8 @@ class DofHelperCalc(Evaluator):
 
     @staticmethod
     def calc_h_hs():
+
+        focus = ParametersStore.get('focus_distance_m').value
         focal_length = ParametersStore.get('focal_length_mm').value
         aperture = ParametersStore.get('aperture').value
         frame_width_px = ParametersStore.get('frame_width_px').value
