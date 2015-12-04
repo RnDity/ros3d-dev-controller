@@ -4,7 +4,6 @@
 """Camera Controller wrapper"""
 from __future__ import absolute_import
 from ros3ddevcontroller.bus.client import DBusClientTask
-import dbus
 
 
 class CameraTask(DBusClientTask):
@@ -39,14 +38,8 @@ class CameraTask(DBusClientTask):
             return
 
         self.logger.debug('obtain proxy to camera controller')
-        try:
-            camctl_obj = self.bus.get_object(self.DBUS_SERVICE_NAME,
-                                             self.DBUS_OBJECT_PATH)
-            self.camctl = dbus.Interface(camctl_obj,
-                                         self.DBUS_INTERFACE_NAME)
-        except dbus.DBusException:
-            self.logger.exception('failed to obtain proxy to camctl')
-        else:
+        self.camctl = self.get_proxy(self.DBUS_OBJECT_PATH, self.DBUS_INTERFACE_NAME)
+        if self.camctl:
             self.logger.debug('got proxy')
 
     def is_active(self):
