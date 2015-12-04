@@ -33,12 +33,6 @@ class ParamApplyError(Exception):
 class ServoTask(DBusTask):
     """Servo driver proxy. The proxy will automatically find a DBus servo
     service and connect to it.
-
-    Since the task is running in a Glib MainLoop possibly on a
-    different thread than the caller of `change_param()` method, a
-    trampoline is used. The request is wrapped into
-    `ParamApplyRequest` and `change_param()` returns a `Future()`
-    object.
     """
     OPT_PREFIX = 'servo-dbus'
 
