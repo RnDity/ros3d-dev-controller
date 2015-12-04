@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import unittest
 import mock
 
-from ros3ddevcontroller.param.parameter import Parameter, ReadOnlyParameter, ParameterStatus
+from ros3ddevcontroller.param.parameter import Parameter, ReadOnlyParameter, ParameterStatus, Infinity
 
 class ParameterTestCase(unittest.TestCase):
     def test_new_no_status(self):
@@ -57,3 +57,25 @@ class ParameterTestCase(unittest.TestCase):
 
         status.set_status(ParameterStatus.HARDWARE)
         self.assertEqual(status.status, ParameterStatus.HARDWARE)
+
+
+class FloatInfinityTestCase(unittest.TestCase):
+    def test_convert_to(self):
+        self.assertEqual(Infinity.convert_to(1e100), Infinity.PLUS)
+        self.assertEqual(Infinity.convert_to(-1e100), Infinity.MINUS)
+        self.assertEqual(Infinity.convert_to(10e20), 10e20)
+        self.assertEqual(Infinity.convert_to(-10e20), -10e20)
+        self.assertEqual(Infinity.convert_to(float('inf')), Infinity.PLUS)
+        self.assertEqual(Infinity.convert_to(float('-inf')), Infinity.MINUS)
+        self.assertEqual(Infinity.convert_to(0.3333), 0.3333)
+        self.assertEqual(Infinity.convert_to(128), 128)
+
+    def test_convert_from(self):
+        self.assertEqual(Infinity.convert_from(Infinity.PLUS), float('inf'))
+        self.assertEqual(Infinity.convert_from(Infinity.MINUS), float('-inf'))
+        self.assertEqual(Infinity.convert_from(10e20), 10e20)
+        self.assertEqual(Infinity.convert_from(-10e20), -10e20)
+        self.assertEqual(Infinity.convert_from(float('inf')), float('inf'))
+        self.assertEqual(Infinity.convert_from(float('-inf')), float('-inf'))
+        self.assertEqual(Infinity.convert_from(0.3333), 0.3333)
+        self.assertEqual(Infinity.convert_from(128), 128)

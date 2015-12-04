@@ -17,6 +17,44 @@ class Infinity:
     PLUS = 1e100
     MINUS = -1e100
 
+    @classmethod
+    def convert_to(cls, value):
+        """Convert a float value to compatible representation. Only applied if
+        input value is +/-Infinity. The output value will be clamped
+        to <MINUS, PLUS> range.
+
+        :param value float: value to convert
+        :rtype: float
+        :return: converted value
+
+        """
+        if not isinstance(value, float):
+            value = float(value)
+
+        if value == float('inf'):
+            return cls.PLUS
+        elif value == float('-inf'):
+            return cls.MINUS
+        return value
+
+    @classmethod
+    def convert_from(cls, value):
+        """Convert a float value in compatible representation to a float
+
+        :param value float: value to convert
+        :rtype: float
+        :return: converted value"""
+
+        if not isinstance(value, float):
+            value = float(value)
+
+        if value >= cls.PLUS:
+            return float('inf')
+        elif value <= cls.MINUS:
+            return float('-inf')
+        return value
+
+
 class ParameterStatus(object):
     """Paramter status wrapper"""
     HARDWARE = 'hardware'
