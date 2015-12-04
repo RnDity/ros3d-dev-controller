@@ -246,7 +246,7 @@ class ConvergencePxCalc(Evaluator):
         frame_width_px = ParametersStore.get('frame_width_px').value
         baseline = ParametersStore.get('baseline_mm').value
         screen = ParametersStore.get('distance_screen_m').value
-        frame_width_mm = ParamtersStore.get('frame_width_mm').value
+        frame_width_mm = ParametersStore.get('frame_width_mm').value
         focal_length = ParametersStore.get('focal_length_mm').value
         return frame_width_px * math.atan(baseline / (2 * 1000 * screen))  / math.atan(frame_width_mm / (2 * focal_length))
 
