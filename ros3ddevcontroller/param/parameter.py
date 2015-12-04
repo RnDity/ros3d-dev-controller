@@ -274,7 +274,10 @@ class ParallaxNearPercentCalc(ParallaxPercentHelperCalc):
         distance_near = ParametersStore.get('distance_near_m').value
         return ParallaxPercentHelperCalc(distance_near)
 
-class ParallaxFarPercentCalc(Evaluator):
+class ParallaxScreenPercentCalc(Evaluator):
+    pass
+
+class ParallaxFarPercentCalc(ParallaxPercentHelperCalc):
 
     def __init__(self):
         self.REQUIRES.append('distance_far_m')
@@ -292,10 +295,6 @@ class ParallaxObject2PercentCalc(Evaluator):
 
 
 class ParallaxNearMMCalc(Evaluator):
-    pass
-
-
-class ParallaxScreenMMCalc(Evaluator):
     pass
 
 

@@ -78,7 +78,7 @@ SYSTEM_PARAMETERS = [
     Parameter('parallax_object1_percent', 0, float, evaluated=True, evaluator=ParallaxObject1PercentCalc),
     Parameter('parallax_object2_percent', 0, float, evaluated=True, evaluator=ParallaxObject2PercentCalc),
     Parameter('parallax_near_mm', 0, float, evaluated=True, evaluator=ParallaxNearMMCalc),
-    Parameter('parallax_screen_mm', 0, float, evaluated=True, evaluator=ParallaxScreenMMCalc),
+    Parameter('parallax_screen_mm', 0, float),
     Parameter('parallax_far_mm', 0, float, evaluated=True, evaluator=ParallaxFarMMCalc),
     Parameter('parallax_object1_mm', 0, float, evaluated=True, evaluator=ParallaxObject1MMCalc),
     Parameter('parallax_object2_mm', 0, float, evaluated=True, evaluator=ParallaxObject2MMCalc),
