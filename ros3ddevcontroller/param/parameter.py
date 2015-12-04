@@ -192,7 +192,7 @@ class DofFarCalc(DofHelperCalc):
             return float('inf')
 
         h, hs = DofHelperCalc.calc_h_hs()
-        far = inf if focus >= h else (hs / (h - focus))
+        far = float('inf') if focus >= h else (hs / (h - focus))
         return far
 
 class DofTotalCalc(Evaluator):
