@@ -4,11 +4,9 @@
 """Servo driver proxy"""
 from __future__ import absolute_import
 
-from sparts.tasks.dbus import DBusTask
-from sparts.sparts import option
 from ros3ddevcontroller.param.store import ParametersStore, SERVO_PARAMETERS
 from ros3ddevcontroller.param.parameter import ParameterStatus, Infinity
-import glib
+from ros3ddevcontroller.bus.client import DBusClientTask
 import logging
 import dbus
 
@@ -30,81 +28,32 @@ class ParamApplyError(Exception):
     pass
 
 
-class ServoTask(DBusTask):
+class ServoTask(DBusClientTask):
     """Servo driver proxy. The proxy will automatically find a DBus servo
     service and connect to it.
     """
     OPT_PREFIX = 'servo-dbus'
 
-    SERVO_DBUS_SERVICE = 'pl.ros3d.servo'
+    DBUS_SERVICE_NAME = 'pl.ros3d.servo'
     SERVO_DBUS_PATH = '/pl/ros3d/servo'
     SERVO_DBUS_INTERFACE = "pl.ros3d.servo"
     SERVO_CALL_TIMEOUT_S = 120 # seconds
 
-    session_bus = option(action='store_true', type=bool,
-                         default=False,
-                         help='Use session bus to access servo service')
-
     def __init__(self, *args, **kwargs):
         super(ServoTask, self).__init__(*args, **kwargs)
 
-        self.bus = None
         self.servo = None
 
-    def start(self):
-        self.asyncRun(self._start_servo)
-        super(ServoTask, self).start()
+    def bus_service_online(self):
+        self.logger.debug('servo online')
+        self._setup_servo_proxy()
+        pstatus = ParameterStatus.HARDWARE
+        self._set_servo_params_status(pstatus)
 
-    def _start_servo(self):
-        """Start task. Perform necessary setup:
-        - bus connection
-        - setup servo service name monitoring
-        - obtain proxy to servo if possible
-        """
-        _log.debug('starting servo task for service: %s', self.service.name)
-        # get bus
-        if self.session_bus:
-            self.bus = dbus.SessionBus(private=True)
-        else:
-            self.bus = dbus.SystemBus(private=True)
-
-        _log.info('using %s bus to access servo',
-                  'session' if self.session_bus else 'system')
-        # proxy to servo service
+    def bus_service_offline(self):
+        self.logger.debug('servo offline')
         self.servo = None
-
-        if self.bus.name_has_owner(ServoTask.SERVO_DBUS_SERVICE):
-            _log.debug('servo module already present, grab proxy')
-            self._setup_servo_proxy()
-
-        # we're monitoring servo name changes
-        self.bus.watch_name_owner(ServoTask.SERVO_DBUS_SERVICE,
-                                  self._servo_name_changed)
-
-
-    def stop(self):
-        """Stop task"""
-        # get rid of reference to bus
-        self.bus = None
-
-        super(ServoTask, self).stop()
-
-    def _servo_name_changed(self, name):
-        """Callback for when a name owner of servo service has changed
-
-        :param str name: service name, either actual servo name or empty
-        """
-
-        _log.debug('servo name changed: %s', name)
-
-        if not name:
-            _log.info('servo driver lost')
-            self.servo = None
-            pstatus = ParameterStatus.SOFTWARE
-        else:
-            self._setup_servo_proxy()
-            pstatus = ParameterStatus.HARDWARE
-
+        pstatus = ParameterStatus.SOFTWARE
         self._set_servo_params_status(pstatus)
 
     @classmethod
@@ -122,10 +71,10 @@ class ServoTask(DBusTask):
 
         _log.debug('obtain proxy to servo')
         try:
-            servo_obj = self.bus.get_object(ServoTask.SERVO_DBUS_SERVICE,
-                                            ServoTask.SERVO_DBUS_PATH)
+            servo_obj = self.bus.get_object(self.DBUS_SERVICE_NAME,
+                                            self.SERVO_DBUS_PATH)
             self.servo = dbus.Interface(servo_obj,
-                                        ServoTask.SERVO_DBUS_INTERFACE)
+                                        self.SERVO_DBUS_INTERFACE)
         except dbus.DBusException:
             _log.exception('failed to obtain proxy to servo')
         else:
