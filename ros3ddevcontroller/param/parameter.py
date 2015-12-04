@@ -11,6 +11,12 @@ import logging
 _log = logging.getLogger(__name__)
 
 
+class Infinity:
+    """Wrapper for infinity specification"""
+    # infinity is expressed as values below
+    PLUS = 1e100
+    MINUS = -1e100
+
 class ParameterStatus(object):
     """Paramter status wrapper"""
     HARDWARE = 'hardware'
