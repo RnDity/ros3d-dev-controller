@@ -93,3 +93,20 @@ class DBusClientTask(DBusTask):
     def bus_service_offline(self):
         """Override this method to handle event when the service becomes unavailable"""
 
+    def get_proxy(self, path, interface):
+        """Obtain proxy to an interface `interface` defined in
+        DBUS_SERVICE_NAME service at path `path`
+
+        :param path str: object path
+        :param interface str: interface name
+        :return: interface proxy
+        """
+        assert self.bus
+        try:
+            obj = self.bus.get_object(self.DBUS_SERVICE_NAME, path)
+            iface_proxy = dbus.Interface(obj, interface)
+        except dbus.DBusException:
+            self.logger.exception('failed to obtain proxy to servo')
+            return None
+        else:
+            return iface_proxy
