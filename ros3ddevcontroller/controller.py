@@ -9,7 +9,7 @@ from ros3ddevcontroller.param.store import ParametersStore, ParameterSnapshotter
 from ros3ddevcontroller.param.backends import FileSnapshotBackend
 from ros3ddevcontroller.bus import servo
 from ros3ddevcontroller.util import make_dir
-
+from threading import Lock
 
 class Controller(object):
     def __init__(self):
@@ -17,6 +17,7 @@ class Controller(object):
         self.servo = None
         self.snapshots_location = None
         self.snapshots_backend = None
+        self.lock = Lock()
 
     def set_servo(self, servo):
         """Servo interface"""
@@ -134,10 +135,11 @@ class Controller(object):
         """Record a snapshot of current parameter set
         :return: ID of snapshot
         """
-        # record timestamp
-        self._record_timestamp()
+        with self.lock:
+            # record timestamp
+            self._record_timestamp()
 
-        return ParameterSnapshotter.save(self.snapshots_backend)
+            return ParameterSnapshotter.save(self.snapshots_backend)
 
     def list_snapshots(self):
         """List IDs of available snapshots
@@ -145,9 +147,10 @@ class Controller(object):
         :rtype list(int):
         :return: list of snapshot IDs
         """
-        snapshots = self.snapshots_backend.list_snapshots()
-        self.logger.debug('snapshots: %s', snapshots)
-        return snapshots
+        with self.lock:
+            snapshots = self.snapshots_backend.list_snapshots()
+            self.logger.debug('snapshots: %s', snapshots)
+            return snapshots
 
     def get_snapshot(self, snapshot_id):
         """Obtain data of snapshot `snapshot_id`. Returns a dictionary with
@@ -157,11 +160,12 @@ class Controller(object):
         :rtype dict:
 
         """
-        self.logger.debug('load snapshot %d', snapshot_id)
-        sdata = self.snapshots_backend.load(snapshot_id)
-        if not sdata:
-            self.logger.error('failed to load snapshot data for ID %d', snapshot_id)
-        return sdata
+        with self.lock:
+            self.logger.debug('load snapshot %d', snapshot_id)
+            sdata = self.snapshots_backend.load(snapshot_id)
+            if not sdata:
+                self.logger.error('failed to load snapshot data for ID %d', snapshot_id)
+            return sdata
 
     def delete_snapshot(self, snapshot_id):
         """Remove snapshot snapshot `snapshot_id`.
@@ -170,8 +174,9 @@ class Controller(object):
         :return: ID of removed snapshot
 
         """
-        self.logger.debug('delete snapshot %d', snapshot_id)
-        return self.snapshots_backend.delete(snapshot_id)
+        with self.lock:
+            self.logger.debug('delete snapshot %d', snapshot_id)
+            return self.snapshots_backend.delete(snapshot_id)
 
     def delete_all(self):
         """Remove all snapshots.
@@ -179,4 +184,5 @@ class Controller(object):
         :return: list of removed snapshot IDs
 
         """
-        return self.snapshots_backend.delete_all()
+        with self.lock:
+            return self.snapshots_backend.delete_all()
