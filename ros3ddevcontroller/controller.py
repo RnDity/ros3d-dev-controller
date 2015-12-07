@@ -32,7 +32,8 @@ class Controller(object):
         # update snapshots backend
         self.snapshots_backend = FileSnapshotBackend(self.snapshots_location)
 
-    def is_servo_parameter(self, param):
+    @classmethod
+    def is_servo_parameter(cls, param):
         """Return true if parameter is applicable to servo"""
         return ParametersStore.is_servo_parameter(param.name)
 
@@ -56,7 +57,8 @@ class Controller(object):
             self.logger.exception('error when applying a parameter')
             return False
 
-    def is_camera_parameter(self, param):
+    @classmethod
+    def is_camera_parameter(cls, param):
         """Return True if parameter is applicable to camera"""
         return ParametersStore.is_camera_parameter(param.name)
 
@@ -68,7 +70,8 @@ class Controller(object):
         :return: True if successful"""
         raise NotImplementedError('not implemented')
 
-    def is_parameter_writable(self, param):
+    @classmethod
+    def is_parameter_writable(cls, param):
         """Return True if parameter is applicable to camera"""
         return ParametersStore.is_read_only(param.name) == False
 
