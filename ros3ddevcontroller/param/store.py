@@ -49,7 +49,16 @@ class ParametersStoreListener(object):
 class ParametersStore(object):
     """System parameters store"""
 
+    # dict of parameter_name: parameter_desc, for quick lookup by
+    # parameter name
     PARAMETERS = {}
+
+    # dict of parameter_name: list(parameter_desc), the list contains
+    # parameter descriptors that depend on given parameter, for
+    # example: for entry 'focus_distance_mm', the list will contain
+    # all descriptors that have their value depend on
+    # 'focus_distance_m'
+    DEPENDENCIES = {}
 
     # Use recursive lock, this allows for internal helpers like
     # _find_param() to have both a thin lockless wrapping or a
@@ -91,15 +100,30 @@ class ParametersStore(object):
         :param list params: list of Parameter objects
         """
         with cls.lock:
+            # 1st pass, load any parameters
             for p in params:
-                assert p.name not in cls.PARAMETERS
+                if p.name in cls.PARAMETERS:
+                    raise RuntimeError('parameter %s defined twice' % p.name)
                 cls.PARAMETERS[p.name] = p
+                cls.DEPENDENCIES[p.name] = []
+
+            # 2nd pass, setup dependencies
+            for p in params:
+                if not p.evaluator:
+                    continue
+                requires = p.evaluator.REQUIRES
+                for req in requires:
+                    if not cls.DEPENDENCIES.has_key(req):
+                        raise RuntimeError('unknown dependency %s in evaluator for parameter %s' \
+                                           % (req, p.name))
+                    cls.DEPENDENCIES[req].append(p)
 
     @classmethod
     def clear_parameters(cls):
         """Remove all parameters"""
         with cls.lock:
             cls.PARAMETERS = {}
+            cls.DEPENDENCIES = {}
 
     @classmethod
     def parameters_as_dict(cls):
@@ -166,12 +190,13 @@ class ParametersStore(object):
         cls._convert(pdesc, desc.value)
 
     @classmethod
-    def set(cls, name, value, notify=True):
+    def set(cls, name, value, notify=True, evaluate=True):
         """Set a parameter, attempts automatic conversion to proper type
 
         :param name str: parameter name
         :param value: parameter value
         :param notify bool: trigger parameter change notification chain
+        :param evaluate bool: trigger parameter evaluation
         :rtype: bool, True if successful
         :return: True if successful
         """
@@ -181,10 +206,49 @@ class ParametersStore(object):
             _log.debug('acquired')
             pdesc = cls._find_param(name)
             pdesc.value = cls._convert(pdesc, value)
+            _log.debug('set value of %s to %s', name, pdesc.value)
             if notify:
                 cls.change_listeners.fire(pdesc)
 
+            if evaluate:
+                cls.evaluate_param_tree(pdesc)
+
         return True
+
+    @classmethod
+    def evaluate_param_tree(cls, param):
+        """Evalaluate paramters that depend on `param`
+
+        :param param Parameter: parameter descriptor
+        """
+        dependant_params = cls.DEPENDENCIES.get(param.name, [])
+        for dep_param in dependant_params:
+            cls.evaluate_single_param(dep_param)
+
+    @classmethod
+    def evaluate_single_param(cls, param):
+        """Evaluate a single parameter. Effectively this method will construct
+        an instance of an evaluator and call it passing required
+        parameters (listed in REQUIRES property of the evaluator) as
+        keywords.
+
+        :param param Parameter: parameter descriptor
+
+        """
+        args = {}
+        for pname in param.evaluator.REQUIRES:
+            args[pname] = ParametersStore.get_value(pname)
+
+        # param.value = param.evaluator()(**args)
+        try:
+            cls.set(param.name, param.evaluator()(**args), notify=False)
+        except ArithmeticError:
+            _log.exception('failed to evaluate parameter %s, args: %s',
+                           param.name, args)
+        except Exception:
+            _log.exception('unexpected error when evaluating parameter %s with args %s',
+                           param.name, args)
+            raise
 
     @classmethod
     def set_status(cls, name, status, notify=True):

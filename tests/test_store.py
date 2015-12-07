@@ -7,7 +7,7 @@ import unittest
 import mock
 
 from ros3ddevcontroller.param.store import ParametersStore, ParameterLoader
-from ros3ddevcontroller.param.parameter import Parameter, ReadOnlyParameter
+from ros3ddevcontroller.param.parameter import Parameter, ReadOnlyParameter, Evaluator
 
 class StoreLoadingTestCase(unittest.TestCase):
     def setUp(self):
@@ -274,3 +274,59 @@ class ParameterGetValueTestCase(unittest.TestCase):
             self.assertEqual(pvalue, param_in.value)
             self.assertEqual(type(pvalue), param_in.value_type)
 
+
+class ParameterEvaluationTestCase(unittest.TestCase):
+    class BarEvaluator(Evaluator):
+        REQUIRES = [
+            'foo'
+        ]
+
+        def __call__(self, foo=None):
+            return foo + 1
+
+    class BazEvaluator(Evaluator):
+        REQUIRES = [
+            'foo',
+            'bar'
+        ]
+
+        def __call__(self, foo=None, bar=None):
+            return foo * bar + 1
+
+    class CafeEvaluator(Evaluator):
+        REQUIRES = [
+            'baz',
+            'bar'
+        ]
+
+        def __call__(self, baz=None, bar=None):
+            return baz ** 2 + bar
+
+    PARAMETERS = [
+        Parameter('foo', 1, int),
+        Parameter('cafe', 0, int, evaluator=CafeEvaluator),
+        Parameter('bar', 0, int, evaluator=BarEvaluator),
+        Parameter('baz', 0, int, evaluator=BazEvaluator),
+    ]
+
+    def setUp(self):
+        ParametersStore.load_parameters(self.PARAMETERS)
+
+    def tearDown(self):
+        ParametersStore.clear_parameters()
+
+    def test_set_value(self):
+
+        self.assertNotEqual(ParametersStore.DEPENDENCIES, {})
+        pdesc_bar = ParametersStore.get('bar')
+
+        ParametersStore.set('foo', 3)
+        bar_val = ParametersStore.get_value('bar')
+        # bar = foo + 1
+        self.assertEqual(bar_val, 4)
+        baz_val = ParametersStore.get_value('baz')
+        # baz = foo * bar + 1
+        self.assertEqual(baz_val, 13)
+        # cafe = baz ** 2 + bar
+        cafe_val = ParametersStore.get_value('cafe')
+        self.assertEqual(cafe_val, 173)
