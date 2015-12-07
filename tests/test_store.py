@@ -17,6 +17,27 @@ class StoreLoadingTestCase(unittest.TestCase):
         ParametersStore.clear_parameters()
 
 
+class StoreLoadClearTestCase(unittest.TestCase):
+    PARAMETERS = [
+        Parameter('foo', 1, int),
+        Parameter('bar', 2, float)
+    ]
+
+    def setUp(self):
+        ParametersStore.clear_parameters()
+
+    def test_load_clear(self):
+        self.assertEqual(ParametersStore.PARAMETERS, {})
+
+        ParametersStore.load_parameters(self.PARAMETERS)
+        self.assertNotEqual(ParametersStore.PARAMETERS, {})
+        self.assertIn('foo', ParametersStore.PARAMETERS)
+        self.assertIn('bar', ParametersStore.PARAMETERS)
+
+        ParametersStore.clear_parameters()
+        self.assertEqual(ParametersStore.PARAMETERS, {})
+
+
 class GetSetStoreTestCase(StoreLoadingTestCase):
 
     def test_get_existing(self):
