@@ -131,9 +131,29 @@ class ReadOnlyParameter(Parameter):
 
 
 class Evaluator(object):
+    REQUIRES = []
 
-    def __call__(self):
+    """A parameter evaluator helper class. When a parameter that has this
+    class as an evaluator needs to be updated, an instance of this
+    class will be created and called with keyword parameters listed in
+    REQUIRES property.
+
+    """
+
+    def __call__(self, **kwargs):
+        """Calculate new value of parameter. The value of parameters that are
+        required for calculating this parameter will be passed as
+        keyword arguments. The evaluation engine will catch and log
+        ArithmeticError exception, other exceptions are allowed to
+        fall through.
+
+        :param **kwargs dict: parameters that are required for calculating this one
+        :rtype: same as parameter
+        :return: new value of parameter
+
+        """
         raise NotImplementedError('Evaluation for {} not implemented'.format(self.__class__.__name__))
+
 
 class DofHelperCalc(Evaluator):
 
