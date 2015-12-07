@@ -137,6 +137,9 @@ class Evaluator(object):
 
     """
 
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
     def __call__(self, **kwargs):
         """Calculate new value of parameter. The value of parameters that are
         required for calculating this parameter will be passed as
