@@ -41,7 +41,7 @@ class Ros3DdevControllerService(VService):
     def initLogging(self):
         """Setup logging to stderr"""
         logging.basicConfig(level=self.loglevel, stream=sys.stderr,
-                            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                            format='%(thread)d %(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         captureWarnings(True)
 
