@@ -15,6 +15,7 @@ from __future__ import absolute_import
 from ros3ddevcontroller.param.parameter import Parameter
 from ros3ddevcontroller.web.codec import ParameterCodec
 from ros3ddevcontroller.param.sysparams import CAMERA_PARAMETERS, SERVO_PARAMETERS
+from threading import RLock
 import logging
 
 
@@ -50,6 +51,11 @@ class ParametersStore(object):
 
     PARAMETERS = {}
 
+    # Use recursive lock, this allows for internal helpers like
+    # _find_param() to have both a thin lockless wrapping or a
+    # complete wrapping like get()/set(). Also, this allows for
+    # parameters to be modified from change_listeners callback
+    lock = RLock()
     change_listeners = ParametersStoreListener()
 
     @staticmethod
@@ -84,31 +90,36 @@ class ParametersStore(object):
 
         :param list params: list of Parameter objects
         """
-        for p in params:
-            assert p.name not in cls.PARAMETERS
-            cls.PARAMETERS[p.name] = p
+        with cls.lock:
+            for p in params:
+                assert p.name not in cls.PARAMETERS
+                cls.PARAMETERS[p.name] = p
 
     @classmethod
     def clear_parameters(cls):
         """Remove all parameters"""
-        cls.PARAMETERS = {}
+        with cls.lock:
+            cls.PARAMETERS = {}
 
     @classmethod
     def parameters_as_dict(cls):
-        params = {}
-        for pname, pp in cls.PARAMETERS.items():
-            params[pname] = ParameterCodec.parameter_to_dict(pp)
-        return params
+        with cls.lock:
+            params = {}
+            for pname, pp in cls.PARAMETERS.items():
+                params[pname] = ParameterCodec.parameter_to_dict(pp)
+            return params
 
     @classmethod
     def _find_param(cls, name):
-        """Find parameter in known parameters dict and return a descriptor
+        """Find parameter in known parameters dict and return a
+        descriptor. Acquires a lock on parameters.
 
         :param str name: parameter name
         :return: parameter descriptor
         """
-        # check if paramter is known
-        pdesc = cls.PARAMETERS.get(name, None)
+        with cls.lock:
+            # check if paramter is known
+            pdesc = cls.PARAMETERS.get(name, None)
         if not pdesc:
             raise KeyError('parameter %s not known' % (name))
         return pdesc
@@ -166,10 +177,12 @@ class ParametersStore(object):
         """
         _log.debug('set parameter %s to %r', name, value)
 
-        pdesc = cls._find_param(name)
-        pdesc.value = cls._convert(pdesc, value)
-        if notify:
-            cls.change_listeners.fire(pdesc)
+        with cls.lock:
+            _log.debug('acquired')
+            pdesc = cls._find_param(name)
+            pdesc.value = cls._convert(pdesc, value)
+            if notify:
+                cls.change_listeners.fire(pdesc)
 
         return True
 
@@ -181,12 +194,11 @@ class ParametersStore(object):
         :param status ParameterStatus: instance of parameter status
         :param notify bool: trigger parameter change notification chain
         :return: True if successful"""
-
-
-        pdesc = cls._find_param(name)
-        pdesc.status = status
-        if notify:
-            cls.change_listeners.fire(pdesc)
+        with cls.lock:
+            pdesc = cls._find_param(name)
+            pdesc.status = status
+            if notify:
+                cls.change_listeners.fire(pdesc)
 
         return True
 
@@ -195,7 +207,8 @@ class ParametersStore(object):
         """Get a parameter"""
 
         _log.debug('get parameter %s', name)
-        pdesc = cls.PARAMETERS.get(name, None)
+        with cls.lock:
+            pdesc = cls.PARAMETERS.get(name, None)
         if not pdesc:
             raise KeyError('parameter %s not found' % (name))
 
@@ -219,7 +232,8 @@ class ParametersStore(object):
 
         :rtype: list(Parameter)
         :return: list of parmeters"""
-        return cls.PARAMETERS.values()
+        with cls.lock:
+            return cls.PARAMETERS.values()
 
 
 class ParameterLoader(object):
