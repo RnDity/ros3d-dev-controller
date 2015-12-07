@@ -13,7 +13,7 @@ from ros3ddevcontroller.param.store import ParametersStore
 _log = logging.getLogger(__name__)
 
 
-class Infinity:
+class Infinity(object):
     """Wrapper for infinity specification"""
     # infinity is expressed as values below
     PLUS = 1e100
