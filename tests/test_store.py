@@ -222,3 +222,34 @@ class ReadOnlyParameterTestCase(unittest.TestCase):
 
         self.assertTrue(ParametersStore.is_read_only('foo-readonly'))
         self.assertFalse(ParametersStore.is_read_only('foo-writable'))
+
+
+class ParameterGetValueTestCase(unittest.TestCase):
+    PARAMETERS = [
+            Parameter('foo', 1, int),
+            Parameter('bar', 'baz', str)
+    ]
+
+    def setUp(self):
+        ParametersStore.load_parameters(self.PARAMETERS)
+
+    def tearDown(self):
+        ParametersStore.clear_parameters()
+
+    def find_key_param(self, name):
+        found = [pdesc for pdesc in self.PARAMETERS
+                 if pdesc.name == name]
+        return found[0]
+
+    def test_get_value(self):
+
+        for param_in in self.PARAMETERS:
+            pdesc = ParametersStore.get(param_in.name)
+            self.assertEqual(param_in.name, pdesc.name)
+            self.assertEqual(param_in.value, pdesc.value)
+            self.assertEqual(param_in.value_type, pdesc.value_type)
+
+            pvalue = ParametersStore.get_value(param_in.name)
+            self.assertEqual(pvalue, param_in.value)
+            self.assertEqual(type(pvalue), param_in.value_type)
+

@@ -202,6 +202,18 @@ class ParametersStore(object):
         return pdesc
 
     @classmethod
+    def get_value(cls, name):
+        """Obtain a parameter's value. Raises KeyError if parameter is not
+        present.
+
+        :rtype: that of parameter
+        :return: parameter value
+
+        """
+        pdesc = cls.get(name)
+        return pdesc.value
+
+    @classmethod
     def get_parameters(cls):
         """Obtaina list of all parameters, symmetric to load_parameters() call
 
