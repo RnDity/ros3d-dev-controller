@@ -28,6 +28,7 @@ class ParametersStoreListener(object):
         self.__handlers = []
 
     def add(self, handler):
+        """Register a handler (only if not registered before)"""
         if handler not in self.__handlers:
             _log.debug('registering %r handler', handler)
             self.__handlers.append(handler)
@@ -35,12 +36,15 @@ class ParametersStoreListener(object):
             _log.warning('handler %r already registered', handler)
 
     def remove(self, handler):
+        """Remove a handler"""
         try:
             self.__handlers.remove(handler)
         except ValueError:
             _log.warning('handler %r was not registered', handler)
 
     def fire(self, *args, **keywargs):
+        """Trigger all handlers, *args and **keywargs are passed directly to
+        handlers"""
         for handler in self.__handlers:
             _log.debug('callling %r', handler)
             handler(*args, **keywargs)
@@ -127,6 +131,7 @@ class ParametersStore(object):
 
     @classmethod
     def parameters_as_dict(cls):
+        """Repack parameter descriptors do dictionary format."""
         with cls.lock:
             params = {}
             for pname, pp in cls.PARAMETERS.items():
