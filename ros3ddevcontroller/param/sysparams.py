@@ -27,7 +27,7 @@ SYSTEM_PARAMETERS = [
     Parameter('location', '', str),
     Parameter('notes', '', str),
 
-    # cli parameters
+    # clip parameters
     ReadOnlyParameter('camera_id', 'A', str),
     Parameter('record_framerate', 25, float),
     Parameter('shutter_deg', 180, float),
