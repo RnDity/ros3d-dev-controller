@@ -9,9 +9,6 @@ import math
 import logging
 
 
-_log = logging.getLogger(__name__)
-
-
 class Infinity(object):
     """Wrapper for infinity specification"""
     # infinity is expressed as values below
