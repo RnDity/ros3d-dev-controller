@@ -445,12 +445,17 @@ class CocUmCalc(Evaluator):
         return 1000 * coc_px * m
 
 class ScreenDistanceCalc(Evaluator):
-    pass
 
+    REQUIRES = [
+        'screen_width_mm',
+        'screen_distance_n'
+    ]
+
+    def __call__(self, screen_distance_n=None, screen_width_mm=None):
+        return screen_distance_n * screen_width_mm;
 
 class SpectatorFovHorizontalDegCalc(Evaluator):
     pass
-
 
 class PerceivedPositionNearPercCalc(Evaluator):
     pass
