@@ -180,6 +180,17 @@ class ParallaxObject2PercentCalc(ParallaxPercentHelperCalc):
                                                                distance_screen_m,
                                                                distance_object2_m)
 
+class ParallaxMmHelperCalc(Evaluator):
+
+    REQUIRES = [
+        'screen_width_m'
+    ]
+
+    @staticmethod
+    def calc_parallax_mm(screen_width_m=None, parallax_percent=None):
+
+        return 10 * screen_width_m * parallax_percent;
+
 class ParallaxNearMMCalc(Evaluator):
     pass
 
