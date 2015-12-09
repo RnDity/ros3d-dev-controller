@@ -387,18 +387,44 @@ class FrameHeightMMCalc(Evaluator):
 class FrameDiagonalMMCalc(Evaluator):
     pass
 
+class FrameCropHelperCalc(Evaluator):
 
-class FrameHorizontalCropCalc(Evaluator):
-    pass
+    REF_FRAME_WIDTH_MM = 36.0
+    REF_FRAME_HEIGHT_MM = 24.0
 
+class FrameHorizontalCropCalc(FrameCropHelperCalc):
 
-class FrameVerticalCropCalc(Evaluator):
-    pass
+    REQUIRES = [
+        'frame_width_mm'
+    ]
 
+    def __call__(self, frame_width_mm):
+        return self.REF_FRAME_WIDTH_MM / frame_width_mm;
 
-class FrameDiagonalCropCalc(Evaluator):
-    pass
+class FrameVerticalCropCalc(FrameCropHelperCalc):
 
+    REQUIRES = [
+        'frame_height_mm'
+    ]
+
+    def __call__(self, frame_height_mm):
+        return self.REF_FRAME_HEIGHT_MM / frame_height_mm
+
+class FrameDiagonalCropCalc(FrameCropHelperCalc):
+
+    REQUIRES = [
+        'frame_width_mm',
+        'frame_height_mm'
+    ]
+
+    def __call__(self, frame_width_mm, frame_height_mm):
+
+        ref_diag = DiagonalHelperCalc.calc_diag(self.REF_FRAME_WIDTH_MM,
+                                                self.REF_FRAME_HEIGHT_MM)
+
+        diag = DiagonalHelperCalc.calc_diag(frame_width_mm, frame_height_mm)
+
+        return ref_diag / diag
 
 class CocUmCalc(Evaluator):
     pass
