@@ -225,6 +225,16 @@ class ParallaxObject2MMCalc(ParallaxMmHelperCalc):
         return ParallaxMmHelperCalc.calc_parallax_mm(screen_width_m,
                                                      parallax_object2_percent)
 
+class RealHeightHelperCalc(Evaluator):
+
+    REQUIRES = [
+        'fov_vertical_deg'
+    ]
+
+    @staticmethod
+    def calc_real_height(fov_vertical_deg=None, distance=None):
+        return 2 * distance * math.tan(math.radians(fov_vertical_deg / 2));
+
 class RealWidthNearCalc(Evaluator):
     pass
 
