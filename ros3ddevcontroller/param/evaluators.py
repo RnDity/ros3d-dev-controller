@@ -200,9 +200,14 @@ class ParallaxNearMMCalc(ParallaxMmHelperCalc):
         return ParallaxMmHelperCalc.calc_parallax_mm(screen_width_m,
                                                      parallax_near_percent)
 
-class ParallaxFarMMCalc(Evaluator):
-    pass
+class ParallaxFarMMCalc(ParallaxMmHelperCalc):
 
+    REQUIRES = ParallaxMmHelperCalc.REQUIRES + ['parallax_far_percent']
+
+    def __call__(self, screen_width_m=None, parallax_far_percent=None):
+
+        return ParallaxMmHelperCalc.calc_parallax_mm(screen_width_m,
+                                                     parallax_far_percent)
 
 class ParallaxObject1MMCalc(Evaluator):
     pass
