@@ -235,6 +235,16 @@ class RealHeightHelperCalc(Evaluator):
     def calc_real_height(fov_vertical_deg=None, distance=None):
         return 2 * distance * math.tan(math.radians(fov_vertical_deg / 2));
 
+class RealWidthHelperCalc(Evaluator):
+
+    REQUIRES = [
+        'fov_horizontal_deg'
+    ]
+
+    @staticmethod
+    def calc_real_width(fov_horizontal_deg=None, distance=None):
+        return 2 * distance * math.tan(math.radians(fov_horizontal_deg / 2));
+
 class RealWidthNearCalc(Evaluator):
     pass
 
