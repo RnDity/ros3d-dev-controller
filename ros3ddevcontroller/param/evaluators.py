@@ -309,13 +309,21 @@ class RealHeightObject1Calc(RealHeightHelperCalc):
         return RealHeightHelperCalc.calc_real_height(fov_vertical_deg,
                                                      distance_object1_m)
 
-class RealWidthObject2Calc(Evaluator):
-    pass
+class RealWidthObject2Calc(RealWidthHelperCalc):
 
+    REQUIRES = RealWidthHelperCalc.REQUIRES + ['distance_object2_m']
 
-class RealHeightObject2Calc(Evaluator):
-    pass
+    def __call__(self, fov_horizontal_deg=None, distance_object2_m=None):
+        return RealWidthHelperCalc.calc_real_width(fov_horizontal_deg,
+                                                  distance_object2_m)
 
+class RealHeightObject2Calc(RealHeightHelperCalc):
+
+    REQUIRES = RealHeightHelperCalc.REQUIRES + ['distance_object2_m']
+
+    def __call__(self, fov_vertical_deg=None, distance_object2_m=None):
+        return RealHeightHelperCalc.calc_real_height(fov_vertical_deg,
+                                                     distance_object2_m)
 
 class FrameWidthMMCalc(Evaluator):
     pass
