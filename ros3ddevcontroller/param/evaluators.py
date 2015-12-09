@@ -6,6 +6,14 @@
 from ros3ddevcontroller.param.parameter import Evaluator
 import math
 
+class DiagonalHelperCalc(Evaluator):
+
+    REQUIRES = []
+
+    @staticmethod
+    def calc_diag(width=None, height=None):
+        return math.sqrt(width * width + height * height);
+
 class DofHelperCalc(Evaluator):
 
     REQUIRES = [
@@ -100,9 +108,18 @@ class FovVerticalDegCalc(FovDegHelperCalc):
         return FovDegHelperCalc.calc_fov(focal_length_mm,
                                          frame_height_mm)
 
-class FovDiagonalDegCalc(Evaluator):
-    pass
+class FovDiagonalDegCalc(FovDegHelperCalc):
 
+    REQUIRES = [
+        'frame_height_mm',
+        'frame_width_mm'
+    ]
+
+    def __call__(self, focal_length_mm=None,
+                 frame_width_mm=None, frame_height_mm=None):
+
+        diag = DiagonalHelperCalc.calc_diag(frame_width_mm, frame_height_mm)
+        return FovDegHelperCalc.calc_fov(focal_length_mm, diag)
 
 class ConvergenceDegCalc(Evaluator):
 
