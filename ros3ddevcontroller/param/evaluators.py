@@ -293,13 +293,21 @@ class RealHeightFarCalc(RealHeightHelperCalc):
         return RealHeightHelperCalc.calc_real_height(fov_vertical_deg,
                                                      distance_far_m)
 
-class RealHeightObject1Calc(Evaluator):
-    pass
+class RealWidthObject1Calc(RealWidthHelperCalc):
 
+    REQUIRES = RealWidthHelperCalc.REQUIRES + ['distance_object1_m']
 
-class RealWidthObject1Calc(Evaluator):
-    pass
+    def __call__(self, fov_horizontal_deg=None, distance_object1_m=None):
+        return RealWidthHelperCalc.calc_real_width(fov_horizontal_deg,
+                                                  distance_object1_m)
 
+class RealHeightObject1Calc(RealHeightHelperCalc):
+
+    REQUIRES = RealHeightHelperCalc.REQUIRES + ['distance_object1_m']
+
+    def __call__(self, fov_vertical_deg=None, distance_object1_m=None):
+        return RealHeightHelperCalc.calc_real_height(fov_vertical_deg,
+                                                     distance_object1_m)
 
 class RealWidthObject2Calc(Evaluator):
     pass
