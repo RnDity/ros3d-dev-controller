@@ -142,10 +142,6 @@ class ParallaxNearPercentCalc(ParallaxPercentHelperCalc):
                                                                distance_near_m)
 
 
-class ParallaxScreenPercentCalc(Evaluator):
-    pass
-
-
 class ParallaxFarPercentCalc(ParallaxPercentHelperCalc):
 
     REQUIRES = ParallaxPercentHelperCalc.REQUIRES + ['distance_far_m']
@@ -157,7 +153,6 @@ class ParallaxFarPercentCalc(ParallaxPercentHelperCalc):
                                                                frame_width_mm,
                                                                distance_screen_m,
                                                                distance_far_m)
-
 
 class ParallaxObject1PercentCalc(Evaluator):
     pass
