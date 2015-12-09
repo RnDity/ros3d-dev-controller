@@ -337,6 +337,18 @@ class FrameWidthMMCalc(Evaluator):
                  sensor_width_px=None, sensor_width_mm=None):
         return sensor_width_mm * frame_width_px / sensor_width_px;
 
+class FrameHeightMMCalc(Evaluator):
+
+    REQUIRES = [
+        'frame_height_px',
+        'sensor_height_px',
+        'sensor_height_mm'
+    ]
+
+    def __call__(self, frame_height_px=None,
+                 sensor_height_px=None, sensor_height_mm=None):
+        return sensor_height_mm * frame_height_px / sensor_height_px;
+
 class FrameDiagonalMMCalc(Evaluator):
     pass
 

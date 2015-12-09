@@ -105,7 +105,7 @@ SYSTEM_PARAMETERS = [
     Parameter('frame_format', '4K', str),
     Parameter('frame_width_mm', 0, float, evaluator=FrameWidthMMCalc),
     Parameter('frame_width_px', 4096, int),
-    Parameter('frame_height_mm', 0, float, evaluator=FrameWidthMMCalc),
+    Parameter('frame_height_mm', 0, float, evaluator=FrameHeightMMCalc),
     Parameter('frame_height_px', 2160, int),
     Parameter('frame_diagonal_mm', 0, float, evaluator=FrameDiagonalMMCalc),
     Parameter('frame_horizontal_crop', 0, float, evaluator=FrameHorizontalCropCalc),
