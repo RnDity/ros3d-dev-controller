@@ -154,9 +154,18 @@ class ParallaxFarPercentCalc(ParallaxPercentHelperCalc):
                                                                distance_screen_m,
                                                                distance_far_m)
 
-class ParallaxObject1PercentCalc(Evaluator):
-    pass
+class ParallaxObject1PercentCalc(ParallaxPercentHelperCalc):
 
+    REQUIRES = ParallaxPercentHelperCalc.REQUIRES + ['distance_object1_m']
+
+    def __call__(self, baseline_mm=None, focal_length_mm=None, frame_width_mm=None,
+                 distance_screen_m=None, distance_object1_m=None):
+
+        return ParallaxPercentHelperCalc.calc_parallax_percent(baseline_mm,
+                                                               focal_length_mm,
+                                                               frame_width_mm,
+                                                               distance_screen_m,
+                                                               distance_object1_m)
 
 class ParallaxObject2PercentCalc(Evaluator):
     pass
