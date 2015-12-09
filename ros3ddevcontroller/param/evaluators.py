@@ -464,27 +464,55 @@ class SpectatorFovHorizontalDegCalc(Evaluator):
     def __call__(self, screen_width_mm=None, screen_distance_m=None):
         return (180 / math.pi) * 2 * math.atan(screen_width_mm / (2 * screen_distance_m))
 
-    pass
+class PerceivedPositionPercHelperCalc(Evaluator):
 
-class PerceivedPositionNearPercCalc(Evaluator):
-    pass
+    REQUIRES = [
+        'interpupillary_distance_mm'
+    ]
 
+    @staticmethod
+    def calc_perceived_pos_perc(interpupillary_distance_mm=None, parallax_mm=None):
+        return 100 * interpupillary_distance_mm / (interpupillary_distance_mm - parallax_mm)
 
-class PerceivedPositionScreenPercCalc(Evaluator):
-    pass
+class PerceivedPositionNearPercCalc(PerceivedPositionPercHelperCalc):
 
+    REQUIRES = PerceivedPositionNearPercCalc.REQUIRES + ['parallax_near_mm']
 
-class PerceivedPositionFarPercCalc(Evaluator):
-    pass
+    def __call__(self, interpupillary_distance_mm=None, parallax_near_mm=None):
+        return PerceivedPositionPercHelperCalc.calc_perceived_pos_perc(interpupillary_distance_mm,
+                                                                  parallax_near_mm)
 
+class PerceivedPositionScreenPercCalc(PerceivedPositionPercHelperCalc):
 
-class PerceivedPositionObject1PercCalc(Evaluator):
-    pass
+    REQUIRES = PerceivedPositionNearPercCalc.REQUIRES + ['parallax_screen_mm']
 
+    def __call__(self, interpupillary_distance_mm=None, parallax_screen_mm=None):
+        return PerceivedPositionPercHelperCalc.calc_perceived_pos_perc(interpupillary_distance_mm,
+                                                                  parallax_screen_mm)
 
-class PerceivedPositionObject2PercCalc(Evaluator):
-    pass
+class PerceivedPositionFarPercCalc(PerceivedPositionPercHelperCalc):
 
+    REQUIRES = PerceivedPositionNearPercCalc.REQUIRES + ['parallax_far_mm']
+
+    def __call__(self, interpupillary_distance_mm=None, parallax_far_mm=None):
+        return PerceivedPositionPercHelperCalc.calc_perceived_pos_perc(interpupillary_distance_mm,
+                                                                  parallax_far_mm)
+
+class PerceivedPositionObject1PercCalc(PerceivedPositionPercHelperCalc):
+
+    REQUIRES = PerceivedPositionNearPercCalc.REQUIRES + ['parallax_object1_mm']
+
+    def __call__(self, interpupillary_distance_mm=None, parallax_object1_mm=None):
+        return PerceivedPositionPercHelperCalc.calc_perceived_pos_perc(interpupillary_distance_mm,
+                                                                  parallax_object1_mm)
+
+class PerceivedPositionObject2PercCalc(PerceivedPositionPercHelperCalc):
+
+    REQUIRES = PerceivedPositionNearPercCalc.REQUIRES + ['parallax_object2_mm']
+
+    def __call__(self, interpupillary_distance_mm=None, parallax_object2_mm=None):
+        return PerceivedPositionPercHelperCalc.calc_perceived_pos_perc(interpupillary_distance_mm,
+                                                                  parallax_object2_mm)
 
 class PerceivedPositionNearMCalc(Evaluator):
     pass
