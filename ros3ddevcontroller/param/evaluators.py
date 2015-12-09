@@ -427,8 +427,22 @@ class FrameDiagonalCropCalc(FrameCropHelperCalc):
         return ref_diag / diag
 
 class CocUmCalc(Evaluator):
-    pass
 
+    REQUIRES = [
+        'coc_px',
+        'sensor_width_mm',
+        'sensor_width_px',
+        'sensor_height_mm',
+        'sensor_height_px'
+    ]
+
+    def __call__(self, coc_px=None, sensor_width_mm=None, sensor_width_px=None,
+                 sensor_height_mm=None, sensor_height_px=None):
+
+        m = min((sensor_width_mm / sensor_width_px),
+                        (sensor_height_mm / sensor_height_px))
+
+        return 1000 * coc_px * m
 
 class ScreenDistanceCalc(Evaluator):
     pass
