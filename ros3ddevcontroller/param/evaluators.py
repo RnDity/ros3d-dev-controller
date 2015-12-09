@@ -447,22 +447,22 @@ class CocUmCalc(Evaluator):
 class ScreenDistanceCalc(Evaluator):
 
     REQUIRES = [
-        'screen_width_mm',
+        'screen_width_m',
         'screen_distance_n'
     ]
 
-    def __call__(self, screen_distance_n=None, screen_width_mm=None):
-        return screen_distance_n * screen_width_mm;
+    def __call__(self, screen_distance_n=None, screen_width_m=None):
+        return screen_distance_n * screen_width_m;
 
 class SpectatorFovHorizontalDegCalc(Evaluator):
 
     REQUIRES = [
-        'screen_width_mm',
+        'screen_width_m',
         'screen_distance_m'
     ]
 
-    def __call__(self, screen_width_mm=None, screen_distance_m=None):
-        return (180 / math.pi) * 2 * math.atan(screen_width_mm / (2 * screen_distance_m))
+    def __call__(self, screen_width_m=None, screen_distance_m=None):
+        return (180 / math.pi) * 2 * math.atan(screen_width_m / (2 * screen_distance_m))
 
 class PerceivedPositionPercHelperCalc(Evaluator):
 
