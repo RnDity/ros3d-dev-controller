@@ -514,21 +514,52 @@ class PerceivedPositionObject2PercCalc(PerceivedPositionPercHelperCalc):
         return PerceivedPositionPercHelperCalc.calc_perceived_pos_perc(interpupillary_distance_mm,
                                                                   parallax_object2_mm)
 
-class PerceivedPositionNearMCalc(Evaluator):
-    pass
+class PerceivedPositionMHelperCalc(Evaluator):
 
+    REQUIRES = [
+        'screen_distance_m'
+    ]
 
-class PerceivedPositionScreenMCalc(Evaluator):
-    pass
+    @staticmethod
+    def calc_perceived_pos_m(screen_distance_m=None, perceived_pos_perc=None):
+        return screen_distance_m * perceived_pos_perc / 100;
 
+class PerceivedPositionNearMCalc(PerceivedPositionMHelperCalc):
 
-class PerceivedPositionFarMCalc(Evaluator):
-    pass
+    REQUIRES = PerceivedPositionMHelperCalc.REQUIRES + ['perceived_position_near_percent']
 
+    def __call__(self, screen_distance_m=None, perceived_position_near_percent=None):
+        return PerceivedPositionMHelperCalc.calc_perceived_pos_m(screen_distance_m,
+                                                                 perceived_position_near_percent)
 
-class PerceivedPositionObject1MCalc(Evaluator):
-    pass
+class PerceivedPositionScreenMCalc(PerceivedPositionMHelperCalc):
 
+    REQUIRES = PerceivedPositionMHelperCalc.REQUIRES + ['perceived_position_screen_percent']
 
-class PerceivedPositionObject2MCalc(Evaluator):
-    pass
+    def __call__(self, screen_distance_m=None, perceived_position_screen_percent=None):
+        return PerceivedPositionMHelperCalc.calc_perceived_pos_m(screen_distance_m,
+                                                                 perceived_position_screen_percent)
+
+class PerceivedPositionFarMCalc(PerceivedPositionMHelperCalc):
+
+    REQUIRES = PerceivedPositionMHelperCalc.REQUIRES + ['perceived_position_far_percent']
+
+    def __call__(self, screen_distance_m=None, perceived_position_far_percent=None):
+        return PerceivedPositionMHelperCalc.calc_perceived_pos_m(screen_distance_m,
+                                                                 perceived_position_far_percent)
+
+class PerceivedPositionObject1MCalc(PerceivedPositionMHelperCalc):
+
+    REQUIRES = PerceivedPositionMHelperCalc.REQUIRES + ['perceived_position_object1_percent']
+
+    def __call__(self, screen_distance_m=None, perceived_position_object1_percent=None):
+        return PerceivedPositionMHelperCalc.calc_perceived_pos_m(screen_distance_m,
+                                                                 perceived_position_object1_percent)
+
+class PerceivedPositionObject2MCalc(PerceivedPositionMHelperCalc):
+
+    REQUIRES = PerceivedPositionMHelperCalc.REQUIRES + ['perceived_position_object2_percent']
+
+    def __call__(self, screen_distance_m=None, perceived_position_object2_percent=None):
+        return PerceivedPositionMHelperCalc.calc_perceived_pos_m(screen_distance_m,
+                                                                 perceived_position_object2_percent)
