@@ -217,9 +217,13 @@ class ParallaxObject1MMCalc(ParallaxMmHelperCalc):
         return ParallaxMmHelperCalc.calc_parallax_mm(screen_width_m,
                                                      parallax_object1_percent)
 
-class ParallaxObject2MMCalc(Evaluator):
-    pass
+class ParallaxObject2MMCalc(ParallaxMmHelperCalc):
 
+    REQUIRES = ParallaxMmHelperCalc.REQUIRES + ['parallax_object2_percent']
+
+    def __call__(self, screen_width_m=None, parallax_object2_percent=None):
+        return ParallaxMmHelperCalc.calc_parallax_mm(screen_width_m,
+                                                     parallax_object2_percent)
 
 class RealWidthNearCalc(Evaluator):
     pass
@@ -331,5 +335,3 @@ class PerceivedPositionObject1MCalc(Evaluator):
 
 class PerceivedPositionObject2MCalc(Evaluator):
     pass
-
-
