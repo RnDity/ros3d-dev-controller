@@ -455,6 +455,15 @@ class ScreenDistanceCalc(Evaluator):
         return screen_distance_n * screen_width_mm;
 
 class SpectatorFovHorizontalDegCalc(Evaluator):
+
+    REQUIRES = [
+        'screen_width_mm',
+        'screen_distance_m'
+    ]
+
+    def __call__(self, screen_width_mm=None, screen_distance_m=None):
+        return (180 / math.pi) * 2 * math.atan(screen_width_mm / (2 * screen_distance_m))
+
     pass
 
 class PerceivedPositionNearPercCalc(Evaluator):
