@@ -74,13 +74,31 @@ class DofTotalCalc(Evaluator):
     def __call__(self, dof_near_m=None, dof_far_m=None):
         return dof_far_m - dof_near_m
 
-class FovHorizontalDegCalc(Evaluator):
-    pass
+class FovDegHelperCalc(Evaluator):
 
+    REQUIRES = [
+        'focal_length_mm'
+    ]
 
-class FovVerticalDegCalc(Evaluator):
-    pass
+    @staticmethod
+    def calc_fov(focal_length_mm=None, size=None):
+        return 2 * math.degrees(math.atan(size / (2 * focal_length_mm)));
 
+class FovHorizontalDegCalc(FovDegHelperCalc):
+
+    REQUIRES = FovDegHelperCalc.REQUIRES + ['frame_width_mm']
+
+    def __call__(self, focal_length_mm=None, frame_width_mm=None):
+        return FovDegHelperCalc.calc_fov(focal_length_mm,
+                                         frame_width_mm)
+
+class FovVerticalDegCalc(FovDegHelperCalc):
+
+    REQUIRES = FovDegHelperCalc.REQUIRES + ['frame_height_mm']
+
+    def __call__(self, focal_length_mm=None, frame_height_mm=None):
+        return FovDegHelperCalc.calc_fov(focal_length_mm,
+                                         frame_height_mm)
 
 class FovDiagonalDegCalc(Evaluator):
     pass
