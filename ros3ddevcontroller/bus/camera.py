@@ -4,6 +4,8 @@
 """Camera Controller wrapper"""
 from __future__ import absolute_import
 from ros3ddevcontroller.bus.client import DBusClientTask
+from ros3ddevcontroller.param.store import ParametersStore, CAMERA_PARAMETERS
+from ros3ddevcontroller.param.parameter import ParameterStatus
 
 
 class CameraTask(DBusClientTask):
@@ -16,10 +18,18 @@ class CameraTask(DBusClientTask):
     DBUS_INTERFACE_NAME = "org.ros3d.CameraController"
     CAMERA_DBUS_INTERFACE = "org.ros3d.Camera"
 
+    CAMERA_STATE_INACTIVE = 0
+    CAMERA_STATE_ACTIVE_STOPPED = 1
+    CAMERA_STATE_ACTIVE_RECORDING = 2
+
+    # states that should trigger a snapshot of parameters
+    SNAPSHOT_STATES = [CAMERA_STATE_ACTIVE_STOPPED, CAMERA_STATE_ACTIVE_RECORDING]
+
     def __init__(self, *args, **kwargs):
         super(CameraTask, self).__init__(*args, **kwargs)
 
         self.camctl = None
+        self.active_cams = []
 
     def start(self):
         super(CameraTask, self).start()
@@ -27,10 +37,49 @@ class CameraTask(DBusClientTask):
     def bus_service_online(self):
         self.logger.debug('camera controller service available')
         self._setup_camctl_proxy()
+        self._set_camera_status(ParameterStatus.SOFTWARE)
+
+    def _set_camera_status(self, pstatus):
+        for pname in CAMERA_PARAMETERS:
+            pdesc = ParametersStore.get(pname)
+            pdesc_status = pdesc.status
+            pdesc_status.set_status(pstatus)
+            ParametersStore.set_status(pname, pdesc_status)
+
+    def _setup_camera(self, cam_path):
+        """Setup camera handling"""
+
+        # skip if camera is already known
+        if self._is_camera_active(cam_path):
+            return
+
+        cam = self.get_proxy(cam_path, self.CAMERA_DBUS_INTERFACE)
+        if cam:
+            cam.connect_to_signal('stateChanged', self._camera_state_changed)
+            cam.connect_to_signal('valueChanged', self._camera_parameter_changed)
+            # add camera to list of used cameras so that a reference
+            # is kept around
+            self.active_cams.append(cam)
+        else:
+            self.logger.warning('failed to obtain proxy to camera %s', cam_path)
+
+    def _camera_state_changed(self, state):
+        self.logger.debug('camera status changed')
+        if state in self.SNAPSHOT_STATES:
+            # take snapshot
+            self.service.controller.take_snapshot()
+
+    def _camera_parameter_changed(self, key, val):
+        self.logger.debug('camera parameter changed: %s: %s', key, val)
+        try:
+            ParametersStore.set(key, val)
+        except KeyError:
+            self.logger.exception('parameter %s = %s not supported', key, val)
 
     def bus_service_offline(self):
         self.logger.debug('camera controller service gone')
         self.camctl = None
+        self._set_camera_status(ParameterStatus.SOFTWARE)
 
     def _setup_camctl_proxy(self):
         """Setup proxy to servo service, call only whe name is resolvable"""
@@ -39,8 +88,27 @@ class CameraTask(DBusClientTask):
 
         self.logger.debug('obtain proxy to camera controller')
         self.camctl = self.get_proxy(self.DBUS_OBJECT_PATH, self.DBUS_INTERFACE_NAME)
+
         if self.camctl:
             self.logger.debug('got proxy')
+            self.camctl.connect_to_signal('cameraFound', self._camera_found)
+            # list available cameras
+            cameras = self.camctl.listCameras()
+            if not cameras:
+                self.logger.info('no cameras present in camera controller')
+            for cam in cameras:
+                self._setup_camera(cam)
+
+    def _camera_found(self, cam_path, used):
+        """Handler for org.ros3d.CameraController.cameraFound signal"""
+        self.logger.debug('found camera %s, used %s', cam_path, used)
+
+        self._setup_camera(cam_path)
+
+    def _is_camera_active(self, cam_path):
+        """Check if camera is already active"""
+        return bool([cam for cam in self.active_cams
+                     if cam_path == cam.object_path])
 
     def is_active(self):
         """Check if camera controller can be used"""
