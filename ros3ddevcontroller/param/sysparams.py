@@ -16,7 +16,21 @@ SERVO_PARAMETERS = [
 ]
 
 CAMERA_PARAMETERS = [
-    'iso'
+    'iso',
+    'camera_type',
+    'record_framerate',
+    'shutter_deg',
+    'scene_no',
+    'shot_no',
+    'take',
+    'start_absolute_timecode',
+    'project_framerate',
+    'director',
+    'director_of_photography',
+    'copyright',
+    'camera_id',
+    'clip_id',
+    'reel_id',
 ]
 
 SYSTEM_PARAMETERS = [
