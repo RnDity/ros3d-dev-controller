@@ -129,7 +129,7 @@ class ConvergenceDegCalc(Evaluator):
     ]
 
     def __call__(self, baseline_mm=None, distance_screen_m=None):
-        return 2 * math.degrees(math.atan((baseline_mm / 2) / distance_screen_m))
+        return 2 * math.degrees(math.atan((baseline_mm / 2) / (1000 * distance_screen_m)))
 
 
 class ConvergencePxCalc(Evaluator):
