@@ -67,6 +67,11 @@ class CameraTask(DBusClientTask):
         else:
             self.logger.warning('failed to obtain proxy to camera %s', cam_path)
 
+    def _remove_camera(self, cam_path):
+        """Remove camera from active cameras list"""
+        self.active_cams = [cam for cam in self.active_cams
+                            if cam.object_path != cam_path]
+
     def _camera_state_changed(self, state):
         self.logger.debug('camera status changed')
         if state in self.SNAPSHOT_STATES:
@@ -84,6 +89,9 @@ class CameraTask(DBusClientTask):
         self.logger.debug('camera controller service gone')
         self.camctl = None
         self._set_camera_status(ParameterStatus.SOFTWARE)
+        for cam in self.active_cams:
+            del cam
+        self.active_cams = []
 
     def _setup_camctl_proxy(self):
         """Setup proxy to servo service, call only whe name is resolvable"""
@@ -96,7 +104,7 @@ class CameraTask(DBusClientTask):
         if self.camctl:
             self.logger.debug('got proxy')
             self.camctl.connect_to_signal('cameraFound', self._camera_found)
-
+            self.camctl.connect_to_signal('cameraDisappeared', self._camera_gone)
             if self._cameras_present():
                 self._setup_cameras()
             else:
@@ -177,6 +185,12 @@ class CameraTask(DBusClientTask):
         self.logger.debug('found camera %s, used %s', cam_path, used)
 
         self._setup_camera(cam_path)
+
+    def _camera_gone(self, cam_path):
+        """Handler for org.ros3d.CameraController.cameraDisappeared signal"""
+        self.logger.debug('camera %s disconnected', cam_path)
+
+        self._remove_camera(cam_path)
 
     def _is_camera_active(self, cam_path):
         """Check if camera is already active"""
