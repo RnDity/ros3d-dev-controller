@@ -6,7 +6,8 @@ from __future__ import absolute_import
 from ros3ddevcontroller.bus.client import DBusClientTask
 from ros3ddevcontroller.param.store import ParametersStore, CAMERA_PARAMETERS
 from ros3ddevcontroller.param.parameter import ParameterStatus
-
+from datetime import datetime
+import glib
 
 class CameraTask(DBusClientTask):
     """Camera Controller proxy
@@ -17,6 +18,8 @@ class CameraTask(DBusClientTask):
     DBUS_OBJECT_PATH = '/org/ros3d/controller'
     DBUS_INTERFACE_NAME = "org.ros3d.CameraController"
     CAMERA_DBUS_INTERFACE = "org.ros3d.Camera"
+
+    DISCOVERY_TIMEOUT = 10
 
     CAMERA_STATE_INACTIVE = 0
     CAMERA_STATE_ACTIVE_STOPPED = 1
@@ -30,6 +33,7 @@ class CameraTask(DBusClientTask):
 
         self.camctl = None
         self.active_cams = []
+        self.last_discovery = None
 
     def start(self):
         super(CameraTask, self).start()
@@ -92,12 +96,81 @@ class CameraTask(DBusClientTask):
         if self.camctl:
             self.logger.debug('got proxy')
             self.camctl.connect_to_signal('cameraFound', self._camera_found)
-            # list available cameras
-            cameras = self.camctl.listCameras()
-            if not cameras:
+
+            if self._cameras_present():
+                self._setup_cameras()
+            else:
                 self.logger.info('no cameras present in camera controller')
-            for cam in cameras:
-                self._setup_camera(cam)
+                self._maybe_trigger_discovery()
+                self._setup_camera_presence_check()
+
+    def _setup_cameras(self):
+        """Setup proxies for all cameras"""
+        assert self.camctl
+
+        # list available cameras
+        cameras = self.camctl.listCameras()
+        if not cameras:
+            self.logger.info('no cameras present in camera controller, aborting setup')
+        for cam in cameras:
+            self.logger.debug('setting up camera %s', cam)
+            self._setup_camera(cam)
+
+    def _cameras_present(self):
+        """Check if there are any cameras known to camera controller
+
+        :return: True if cameras are present
+        """
+        if not self.camctl:
+            return False
+
+        cameras = self.camctl.listCameras()
+        if not cameras:
+            self.logger.debug('no cameras present')
+            return False
+        else:
+            return True
+
+    def _maybe_trigger_discovery(self):
+        """Trigger camera discovery under condition that no cameras are
+        present in camera controller and the last trigger was more
+        than DISCOVERY_TIMEOUT seconds away
+
+        :return: True if discovery was triggered
+
+        """
+        if self._cameras_present():
+            self.logger.debug('cameras present, discovery not needed')
+            return False
+
+        if self.last_discovery:
+            diff = (datetime.now() - self.last_discovery).total_seconds()
+        else:
+            diff = self.DISCOVERY_TIMEOUT
+
+        self.logger.debug('last discovery %s seconds ago', diff)
+        if diff >= self.DISCOVERY_TIMEOUT:
+            self.logger.debug('triggering camera discovery')
+            self.last_discovery = datetime.now()
+            self.camctl.triggerDiscovery()
+            return True
+        return False
+
+    def _camera_presence_check(self):
+        """Glib timeout callback. Check if camera controller has any
+        cameras. If so, perform necessary setup, otherwise, schedule another
+        callback"""
+        self.logger.debug('camera presence check')
+        if not self._cameras_present():
+            self._maybe_trigger_discovery()
+            self._setup_camera_presence_check()
+        return False
+
+    def _setup_camera_presence_check(self):
+        """Setup camera presence check to happen in future"""
+        self.logger.debug('camera presence check in %s seconds', self.DISCOVERY_TIMEOUT)
+        glib.timeout_add_seconds(self.DISCOVERY_TIMEOUT,
+                                 self._camera_presence_check)
 
     def _camera_found(self, cam_path, used):
         """Handler for org.ros3d.CameraController.cameraFound signal"""
