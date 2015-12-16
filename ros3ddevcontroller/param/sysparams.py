@@ -31,6 +31,13 @@ CAMERA_PARAMETERS = [
     'camera_id',
     'clip_id',
     'reel_id',
+    'camera_operator',
+    'location',
+    'frame_width_px',
+    'frame_height_px',
+    'frame_format',
+    'camera_operator',
+    'production_name',
 ]
 
 SYSTEM_PARAMETERS = [
