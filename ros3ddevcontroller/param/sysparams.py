@@ -111,7 +111,7 @@ SYSTEM_PARAMETERS = [
     # camera
     ReadOnlyParameter('stereoscopic_set', True, bool),
     ReadOnlyParameter('stereo_setup', 'C', str),
-    Parameter('camera_type', 'RED Mysterium-X', str),
+    ReadOnlyParameter('camera_type', 'RED Mysterium-X', str),
     Parameter('sensor_width_mm', 27.7, float),
     Parameter('sensor_width_px', 5120, int),
     Parameter('sensor_height_mm', 14.6, float),
