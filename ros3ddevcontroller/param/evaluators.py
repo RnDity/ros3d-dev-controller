@@ -563,3 +563,13 @@ class PerceivedPositionObject2MCalc(PerceivedPositionMHelperCalc):
     def __call__(self, screen_distance_m=None, perceived_position_object2_percent=None):
         return PerceivedPositionMHelperCalc.calc_perceived_pos_m(screen_distance_m,
                                                                  perceived_position_object2_percent)
+
+class ShutterUSCalc(Evaluator):
+
+    REQUIRES = [
+        'record_framerate',
+        'shutter_deg'
+    ]
+
+    def __call__(self, record_framerate=None, shutter_deg=None):
+        return 1000000 / record_framerate * shutter_deg / 360

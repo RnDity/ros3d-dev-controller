@@ -55,7 +55,7 @@ SYSTEM_PARAMETERS = [
     ReadOnlyParameter('camera_id', 'A', str),
     Parameter('record_framerate', 25, float),
     Parameter('shutter_deg', 180, float),
-    ReadOnlyParameter('shutter_us', 20000, float),
+    ReadOnlyParameter('shutter_us', 20000, float, evaluator=ShutterUSCalc),
     Parameter('iso', 800, int),
     Parameter('filters', '', str),
     ReadOnlyParameter('reel_id', '001', str),
