@@ -180,6 +180,6 @@ SYSTEM_PARAMETERS = [
     Parameter('director_of_photography', '', str),
     Parameter('camera_operator', '', str),
     Parameter('stereographer', '', str),
-    Parameter('copyright', '', str),
     Parameter('project_framerate', 25, float),
+    ReadOnlyParameter('copyright', '', str),
 ]
