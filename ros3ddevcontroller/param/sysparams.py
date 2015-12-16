@@ -22,7 +22,7 @@ CAMERA_PARAMETERS = [
     'shutter_deg',
     'scene_no',
     'shot_no',
-    'take',
+    'take_no',
     'start_absolute_timecode',
     'project_framerate',
     'director',
@@ -38,6 +38,8 @@ CAMERA_PARAMETERS = [
     'frame_format',
     'camera_operator',
     'production_name',
+    'record_date',
+    'record_time',
 ]
 
 SYSTEM_PARAMETERS = [
@@ -52,12 +54,14 @@ SYSTEM_PARAMETERS = [
     ReadOnlyParameter('camera_id', 'A', str),
     Parameter('record_framerate', 25, float),
     Parameter('shutter_deg', 180, float),
+    ReadOnlyParameter('shutter_us', 180, float),
     Parameter('iso', 800, int),
     Parameter('filters', '', str),
     ReadOnlyParameter('reel_id', '001', str),
     ReadOnlyParameter('clip_id', '001', str),
-    Parameter('take', '3', str),
+    Parameter('take_no', '3', str),
     ReadOnlyParameter('record_date', '', str),
+    ReadOnlyParameter('record_time', '', str),
     ReadOnlyParameter('start_absolute_timecode', '', str),
     Parameter('frames', 0, int),
     Parameter('rating', '', str),
