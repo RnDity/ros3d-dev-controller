@@ -65,7 +65,7 @@ SYSTEM_PARAMETERS = [
     ReadOnlyParameter('record_time', '', str),
     ReadOnlyParameter('start_absolute_timecode', '', str),
     Parameter('frames', 0, int),
-    Parameter('rating', '', str),
+    Parameter('rating', 0, int),
     Parameter('circle', False, bool),
     Parameter('script_notes', '', str),
     Parameter('camera_notes', '', str),
