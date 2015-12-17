@@ -53,7 +53,7 @@ class Controller(object):
         self.logger.debug('set servo param')
         try:
             if self.servo.is_active():
-                res = self.servo.change_param(param.name, value)
+                res = self.servo.change_param(name, value)
                 self.logger.debug('apply result: %s', res)
                 return res
             else:
