@@ -110,7 +110,7 @@ class FovVerticalDegCalc(FovDegHelperCalc):
 
 class FovDiagonalDegCalc(FovDegHelperCalc):
 
-    REQUIRES = [
+    REQUIRES = FovDegHelperCalc.REQUIRES + [
         'frame_height_mm',
         'frame_width_mm'
     ]
