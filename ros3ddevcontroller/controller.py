@@ -15,6 +15,7 @@ class Controller(object):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.servo = None
+        self.camera = None
         self.snapshots_location = None
         self.snapshots_backend = None
         self.lock = Lock()
@@ -23,6 +24,10 @@ class Controller(object):
         """Servo interface"""
         self.logger.debug('setting servo to %s', servo)
         self.servo = servo
+
+    def set_camera(self, camera):
+        self.logger.debug('setting camera to %s', camera)
+        self.camera = camera
 
     def set_snapshots_location(self, loc):
         """Set location of snapshots"""
