@@ -227,11 +227,15 @@ class CameraTask(DBusClientTask):
                      if cam_path == cam.object_path])
 
     def is_active(self):
-        """Check if camera controller can be used"""
-        self.logger.debug('camctl active? %s', 'yes' if self.camctl else 'no')
-        if self.camctl:
-            return True
-        return False
+        """Check if camera controller is active, meaning camera controller is
+        present on the bus and active cameras exist"""
+        if self.camctl and self.active_cams:
+            retval = True
+        else:
+            retval = False
+
+        self.logger.debug('camctl active? %s', 'yes' if retval else 'no')
+        return retval
 
     @classmethod
     def _get_param(cls, cam, param):
