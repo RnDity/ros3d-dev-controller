@@ -80,6 +80,9 @@ class CameraTask(DBusClientTask):
 
     def _camera_parameter_changed(self, key, val):
         self.logger.debug('camera parameter changed: %s: %s', key, val)
+        if key not in CAMERA_PARAMETERS:
+            self.logger.debug('parameter %s is not a camera parameter', key)
+            return
         try:
             ParametersStore.set(key, val)
         except KeyError:
