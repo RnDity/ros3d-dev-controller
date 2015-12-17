@@ -139,6 +139,7 @@ SYSTEM_PARAMETERS = [
     ReadOnlyParameter('frame_diagonal_crop', 0, float, evaluator=FrameDiagonalCropCalc),
     Parameter('coc_px', 2, float),
     Parameter('coc_um', 0, float, evaluator=CocUmCalc),
+    ReadOnlyParameter('record_state', 0, int),
 
     # integration
     Parameter('rig_controller_url', '', str),
