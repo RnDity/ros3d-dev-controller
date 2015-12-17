@@ -71,3 +71,4 @@ class Ros3DKRControllerService(Ros3DdevControllerService):
 
     def initService(self):
         self.controller.set_servo(self.getTask(ServoTask))
+        self.controller.set_camera(self.getTask(CameraTask))
