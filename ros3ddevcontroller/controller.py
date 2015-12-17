@@ -131,7 +131,9 @@ class Controller(object):
     def _record_timestamp(self):
         """Helper for updating current timestamp in parameters"""
         now = datetime.datetime.now()
-        ParametersStore.set('record_date', str(now),
+        ParametersStore.set('record_date', now.strftime('%Y-%m-%d'),
+                            notify=False)
+        ParametersStore.set('record_time', now.strftime('%H:%M:%S'),
                             notify=False)
 
     def take_snapshot(self):
