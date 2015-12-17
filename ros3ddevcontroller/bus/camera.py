@@ -248,6 +248,18 @@ class CameraTask(DBusClientTask):
         """
         return cam.getValue(param)
 
+    @classmethod
+    def _set_param(cls, cam, param, value):
+        """Obtain a parameter from camera
+
+        :param cam: camera proxy
+        :param param str: parameter name
+        :param value str: parameter value
+        :rtype: string
+        :return: parameter value
+        """
+        return cam.setValue(param, value)
+
     def _update_camera_parameters(self, cam):
         """Update camera related parameters"""
         self.logger.debug('updating camera parameters')
@@ -259,4 +271,25 @@ class CameraTask(DBusClientTask):
             except dbus.DBusException:
                 self.logger.exception('failed to obtain parameter %s from camera %s',
                                       param, cam.object_path)
+
+    def set_param(self, param, value):
+        """Try to set a parameter in the camera
+
+        :param param str: parameter name
+        :param value str: parameter value:
+        :rtype: bool
+        :return: True if parameter was sent to camera
+        """
+        if not self.active_cams:
+            self.logger.warning('cannot set a parameter, no active cameras')
+            return
+
+        cam = self.active_cams[0]
+        try:
+            self._set_param(cam, param, value)
+            return True
+        except dbus.DBusException:
+            self.logger.exception('failed to set parameter %s to %s on camera %s',
+                                  param, value, cam.object_path)
+            return False
 
