@@ -78,6 +78,13 @@ class CameraTask(DBusClientTask):
 
     def _camera_state_changed(self, state):
         self.logger.debug('camera status changed')
+
+        if state == self.CAMERA_STATE_ACTIVE_STOPPED:
+            record_state = 0
+        elif state == self.CAMERA_STATE_ACTIVE_RECORDING:
+            record_state = 1
+        ParametersStore.set('record_state', record_state)
+
         if state in self.SNAPSHOT_STATES:
             # take snapshot
             self.service.controller.take_snapshot()
