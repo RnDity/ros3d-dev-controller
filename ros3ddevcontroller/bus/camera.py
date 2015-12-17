@@ -26,8 +26,12 @@ class CameraTask(DBusClientTask):
     CAMERA_STATE_ACTIVE_STOPPED = 1
     CAMERA_STATE_ACTIVE_RECORDING = 2
 
-    # states that should trigger a snapshot of parameters
-    SNAPSHOT_STATES = [CAMERA_STATE_ACTIVE_STOPPED, CAMERA_STATE_ACTIVE_RECORDING]
+    # states that should trigger a snapshot of parameters, each is a
+    # tuple of (current state, previous state)
+    SNAPSHOT_STATES = [
+        (CAMERA_STATE_ACTIVE_STOPPED, CAMERA_STATE_ACTIVE_RECORDING),
+        (CAMERA_STATE_ACTIVE_RECORDING, CAMERA_STATE_ACTIVE_STOPPED)
+    ]
 
     def __init__(self, *args, **kwargs):
         super(CameraTask, self).__init__(*args, **kwargs)
@@ -35,6 +39,7 @@ class CameraTask(DBusClientTask):
         self.camctl = None
         self.active_cams = []
         self.last_discovery = None
+        self.camera_state = self.CAMERA_STATE_INACTIVE
 
     def start(self):
         super(CameraTask, self).start()
@@ -65,6 +70,11 @@ class CameraTask(DBusClientTask):
             # add camera to list of used cameras so that a reference
             # is kept around
             self.active_cams.append(cam)
+
+            # update state
+            self.camera_state = self.CAMERA_STATE_ACTIVE_STOPPED
+            self.logger.debug('camera state: %s', self.camera_state)
+
             # update status of parameters
             self._set_camera_status(ParameterStatus.HARDWARE)
             # update parameter values
@@ -78,7 +88,8 @@ class CameraTask(DBusClientTask):
                             if cam.object_path != cam_path]
 
     def _camera_state_changed(self, state):
-        self.logger.debug('camera status changed')
+        self.logger.debug('camera status changed: %d -> %d',
+                          self.camera_state, state)
 
         if state == self.CAMERA_STATE_ACTIVE_STOPPED:
             record_state = 0
@@ -86,9 +97,12 @@ class CameraTask(DBusClientTask):
             record_state = 1
         ParametersStore.set('record_state', record_state)
 
-        if state in self.SNAPSHOT_STATES:
+        if (state, self.camera_state) in self.SNAPSHOT_STATES:
             # take snapshot
             self.service.controller.take_snapshot()
+
+        # update current camera state
+        self.camera_state = state
 
     def _camera_parameter_changed(self, key, val):
         self.logger.debug('camera parameter changed: %s: %s', key, val)
