@@ -66,6 +66,8 @@ class CameraTask(DBusClientTask):
             self.active_cams.append(cam)
             # update status of parameters
             self._set_camera_status(ParameterStatus.HARDWARE)
+            # update parameter values
+            self._update_camera_parameters(cam)
         else:
             self.logger.warning('failed to obtain proxy to camera %s', cam_path)
 
@@ -208,3 +210,23 @@ class CameraTask(DBusClientTask):
         if self.camctl:
             return True
         return False
+
+    @classmethod
+    def _get_param(cls, cam, param):
+        """Obtain a parameter from camera
+
+        :param cam: camera proxy
+        :param param str: parameter name
+        :rtype: string
+        :return: parameter value
+        """
+        return cam.getValue(param)
+
+    def _update_camera_parameters(self, cam):
+        """Update camera related parameters"""
+        self.logger.debug('updating camera parameters')
+        for param in CAMERA_PARAMETERS:
+            val = self._get_param(cam, param)
+            self.logger.debug('current value: %s -> %s', param, val)
+            ParametersStore.set(param, val)
+
