@@ -57,14 +57,9 @@ class DBusClientTask(DBusTask):
                          'session' if self.session_bus else 'system',
                          self.DBUS_SERVICE_NAME)
 
-        if self.bus.name_has_owner(self.DBUS_SERVICE_NAME):
-            self.logger.debug('bus service already present, grab proxy')
-            self.bus_service_online()
-
         # we're monitoring service name changes
         self.bus.watch_name_owner(self.DBUS_SERVICE_NAME,
                                   self._bus_service_name_changed)
-
 
     def stop(self):
         """Stop task"""
