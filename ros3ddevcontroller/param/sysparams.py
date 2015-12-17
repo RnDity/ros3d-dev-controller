@@ -41,6 +41,10 @@ CAMERA_PARAMETERS = [
     'production_name',
     'record_date',
     'record_time',
+    'sensor_width_mm',
+    'sensor_height_mm',
+    'sensor_width_px',
+    'sensor_height_px'
 ]
 
 SYSTEM_PARAMETERS = [
