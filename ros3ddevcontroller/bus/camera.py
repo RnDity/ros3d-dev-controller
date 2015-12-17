@@ -64,6 +64,8 @@ class CameraTask(DBusClientTask):
             # add camera to list of used cameras so that a reference
             # is kept around
             self.active_cams.append(cam)
+            # update status of parameters
+            self._set_camera_status(ParameterStatus.HARDWARE)
         else:
             self.logger.warning('failed to obtain proxy to camera %s', cam_path)
 
