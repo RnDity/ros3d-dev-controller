@@ -8,6 +8,7 @@ from ros3ddevcontroller.param.store import ParametersStore, CAMERA_PARAMETERS
 from ros3ddevcontroller.param.parameter import ParameterStatus
 from datetime import datetime
 import glib
+import dbus
 
 class CameraTask(DBusClientTask):
     """Camera Controller proxy
@@ -233,7 +234,11 @@ class CameraTask(DBusClientTask):
         """Update camera related parameters"""
         self.logger.debug('updating camera parameters')
         for param in CAMERA_PARAMETERS:
-            val = self._get_param(cam, param)
-            self.logger.debug('current value: %s -> %s', param, val)
-            ParametersStore.set(param, val)
+            try:
+                val = self._get_param(cam, param)
+                self.logger.debug('current value: %s -> %s', param, val)
+                ParametersStore.set(param, val)
+            except dbus.DBusException:
+                self.logger.exception('failed to obtain parameter %s from camera %s',
+                                      param, cam.object_path)
 
