@@ -91,10 +91,10 @@ class CameraTask(DBusClientTask):
         self.logger.debug('camera status changed: %d -> %d',
                           self.camera_state, state)
 
-        if state == self.CAMERA_STATE_ACTIVE_STOPPED:
-            record_state = 0
-        elif state == self.CAMERA_STATE_ACTIVE_RECORDING:
+        if state == self.CAMERA_STATE_ACTIVE_RECORDING:
             record_state = 1
+        else:
+            record_state = 0
         ParametersStore.set('record_state', record_state)
 
         if (state, self.camera_state) in self.SNAPSHOT_STATES:
