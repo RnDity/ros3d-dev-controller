@@ -46,8 +46,8 @@ class CameraTask(DBusClientTask):
 
     def bus_service_online(self):
         self.logger.debug('camera controller service available')
-        self._setup_camctl_proxy()
         self._set_camera_status(ParameterStatus.SOFTWARE)
+        self._setup_camctl_proxy()
 
     def _set_camera_status(self, pstatus):
         for pname in CAMERA_PARAMETERS:
