@@ -73,7 +73,18 @@ class Controller(object):
         :param param Parameter: parameter to apply
         :rtype: bool
         :return: True if successful"""
-        raise NotImplementedError('not implemented')
+        value, name = param.value, param.name
+
+        try:
+            if self.camera.is_active():
+                res = self.camera.set_param(name, value)
+                self.logger.debug('apply result: %s', res)
+                return res
+            else:
+                return self.apply_other_parameter(param)
+        except Exception:
+            self.logger.exception('unexpected error when setting camera parameter')
+            return False
 
     @classmethod
     def is_parameter_writable(cls, param):
