@@ -121,9 +121,8 @@ class ServoTask(DBusClientTask):
                                       timeout=ServoTask.SERVO_CALL_TIMEOUT_S)
             self.logger.debug('parameter \'%s\' -> %s set request done, result: %s ',
                               request.param, request.value, res)
-        except Exception as err:
-            # TODO: catch DBus exception instead of Exception
-            self.logger.exception('error when setting %s -> %s:',
+        except dbus.DBusException:
+            self.logger.exception('error when setting servo parameter %s -> %s:',
                                   request.param, request.value)
             return False
         else:
