@@ -54,6 +54,7 @@ class ServoTask(DBusClientTask):
 
     @classmethod
     def _set_servo_params_status(cls, pstatus):
+        """Update status of parameters that are applied to servo"""
         for pname in SERVO_PARAMETERS:
             pdesc = ParametersStore.get(pname)
             pdesc_status = pdesc.status
