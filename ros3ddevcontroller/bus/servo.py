@@ -7,7 +7,7 @@ from __future__ import absolute_import
 from ros3ddevcontroller.param.store import ParametersStore, SERVO_PARAMETERS
 from ros3ddevcontroller.param.parameter import ParameterStatus, Infinity
 from ros3ddevcontroller.bus.client import DBusClientTask
-
+import dbus
 
 class ParamApplyRequest(object):
     """Wrapper for keeping a parameter apply request in check
@@ -43,6 +43,7 @@ class ServoTask(DBusClientTask):
     def bus_service_online(self):
         self.logger.debug('servo online')
         self._setup_servo_proxy()
+        self._update_servo_parameters()
         pstatus = ParameterStatus.HARDWARE
         self._set_servo_params_status(pstatus)
 
@@ -72,6 +73,19 @@ class ServoTask(DBusClientTask):
             self.logger.debug('got proxy')
             # connect to value change signal
             self.servo.connect_to_signal('valueChanged', self._servo_value_changed)
+
+    def _update_servo_parameters(self):
+        """Update servo parameters after connecting"""
+        if not self.servo:
+            return
+
+        for param in SERVO_PARAMETERS:
+            try:
+                val = self.servo.getValue(param)
+                ParametersStore.set(param, val)
+            except dbus.DBusException:
+                self.logger.exception('failed to update parameter %s from servo',
+                                      param)
 
     def _servo_value_changed(self, parameter, motor, limit, in_progress, value):
         """pl.ros3d.servo.valueChanged signal handler"""
