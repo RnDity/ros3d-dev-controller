@@ -94,6 +94,7 @@ def main(opts):
     logging.info('connecting to: %s:%d keepalive %d',
                  opts.mqtt_host, opts.mqtt_port, opts.mqtt_keepalive)
 
+    client.max_inflight_messages_set(100)
     client.connect(opts.mqtt_host, opts.mqtt_port,
                    opts.mqtt_keepalive)
     client.loop_forever()
