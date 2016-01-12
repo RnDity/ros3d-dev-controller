@@ -64,7 +64,7 @@ def on_connect(client, opts, rc):
 
 
 def on_message(client, _, message):
-    logging.debug('message from topic: %s', message.topic)
+    # logging.debug('message from topic: %s', message.topic)
 
     # we're expecting a JSON so this should be ok
     try:
