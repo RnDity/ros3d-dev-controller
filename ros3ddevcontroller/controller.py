@@ -96,7 +96,7 @@ class Controller(object):
 
         try:
             if self.camera.is_active():
-                res = self.camera.set_param(name, value)
+                res = self.camera.set_param(name, str(value))
                 self.logger.debug('apply result: %s', res)
                 return res
             else:
