@@ -27,6 +27,7 @@ import argparse
 import paho.mqtt.client as mqtt
 import logging
 import json
+from datetime import datetime
 from pprint import pprint
 
 
@@ -68,7 +69,13 @@ def on_message(client, _, message):
 
     # we're expecting a JSON so this should be ok
     try:
-        pprint(json.loads(message.payload))
+        # pprint(json.loads(message.payload))
+        params = json.loads(message.payload)
+        for pname, pdata in params.items():
+            logging.info('%s: %s (%s) -> %s', datetime.now(),
+                          pname,
+                          pdata['status']['status'],
+                          pdata['value'])
     except ValueError:
         logging.exception('invalid JSON in message payload')
         logging.error('offending message: %s', message.payload)
