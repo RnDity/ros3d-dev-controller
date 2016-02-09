@@ -39,7 +39,6 @@ CAMERA_PARAMETERS = [
     'camera_type',
     'record_framerate',
     'shutter_us',
-    'shutter_deg',
     'scene_no',
     'shot_no',
     'take_no',
